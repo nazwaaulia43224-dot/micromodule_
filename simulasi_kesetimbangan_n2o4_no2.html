@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Kesetimbangan N2O4 ⇌ 2NO2 (Gelas Kimia)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        /* Latar belakang kanvas dibuat dengan pola grid halus agar gelas kimia terlihat jelas */
+        canvas { 
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+            border-radius: 0.5rem;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col">
+        
+        <header class="bg-slate-800 text-white p-6 text-center">
+            <h1 class="text-2xl md:text-3xl font-bold mb-2">Simulasi Kesetimbangan Dinamis Kimia</h1>
+            <p class="text-slate-300 text-lg font-mono tracking-widest">N<sub class="text-sm">2</sub>O<sub class="text-sm">4 (g)</sub> ⇌ 2NO<sub class="text-sm">2 (g)</sub></p>
+        </header>
+
+        <div class="flex flex-col lg:flex-row p-6 gap-6">
+            
+            <div class="flex-1 flex flex-col">
+                <div class="relative w-full aspect-[4/3] max-h-[500px] border-2 border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                    <canvas id="simCanvas" class="w-full h-full block"></canvas>
+                    
+                    <!-- Legenda -->
+                    <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm p-3 rounded shadow text-sm border border-slate-100 z-10">
+                        <p class="font-bold mb-2 text-xs text-slate-500 uppercase tracking-wider">Legenda (Standar CPK)</p>
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 relative flex items-center justify-center">
+                                <div class="absolute w-3 h-3 bg-blue-600 rounded-full -ml-2 z-10 border border-black/10"></div>
+                                <div class="absolute w-3 h-3 bg-blue-600 rounded-full ml-2 z-10 border border-black/10"></div>
+                                <div class="absolute w-2.5 h-2.5 bg-red-600 rounded-full -ml-4 -mt-3 border border-black/10"></div>
+                                <div class="absolute w-2.5 h-2.5 bg-red-600 rounded-full -ml-4 mt-3 border border-black/10"></div>
+                                <div class="absolute w-2.5 h-2.5 bg-red-600 rounded-full ml-4 -mt-3 border border-black/10"></div>
+                                <div class="absolute w-2.5 h-2.5 bg-red-600 rounded-full ml-4 mt-3 border border-black/10"></div>
+                            </div>
+                            <span class="font-medium">N<sub>2</sub>O<sub>4</sub> (Tak Berwarna)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 relative flex items-center justify-center">
+                                <div class="absolute w-3 h-3 bg-blue-600 rounded-full z-10 border border-black/10"></div>
+                                <div class="absolute w-2.5 h-2.5 bg-red-600 rounded-full -ml-3 -mt-3 border border-black/10"></div>
+                                <div class="absolute w-2.5 h-2.5 bg-red-600 rounded-full ml-3 -mt-3 border border-black/10"></div>
+                            </div>
+                            <span class="font-medium text-amber-800">NO<sub>2</sub> (Coklat Kemerahan)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-4 border border-slate-200 rounded-lg bg-slate-50">
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Sifat Makroskopis (Jumlah Molekul)</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="font-bold">N<sub>2</sub>O<sub>4</sub></span>
+                                <span id="n2o4Count" class="font-mono bg-slate-200 px-2 rounded text-slate-700">0</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                                <div id="n2o4Bar" class="bg-slate-400 h-2.5 rounded-full transition-all duration-300" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="font-bold text-amber-700">NO<sub>2</sub></span>
+                                <span id="no2Count" class="font-mono bg-amber-100 px-2 rounded text-amber-800">0</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                                <div id="no2Bar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-300" style="width: 50%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-1/3 flex flex-col gap-4">
+                <div class="bg-white p-5 border border-slate-200 rounded-lg shadow-sm">
+                    <h2 class="text-lg font-bold mb-4 border-b pb-2 text-slate-800">Kontrol Sistem</h2>
+                    
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Suhu Sistem (Efek Le Chatelier)</label>
+                        <input type="range" id="tempSlider" min="1" max="100" value="30" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        <div class="flex justify-between text-xs text-slate-500 mt-1">
+                            <span>Rendah (Eksoterm)</span>
+                            <span>Tinggi (Endoterm)</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                        <button id="addN2O4Btn" class="bg-slate-100 hover:bg-slate-200 text-slate-800 py-2 px-4 rounded text-sm font-medium transition-colors border border-slate-300 shadow-sm active:bg-slate-300">
+                            + Tambah N<sub>2</sub>O<sub>4</sub>
+                        </button>
+                        <button id="addNO2Btn" class="bg-amber-100 hover:bg-amber-200 text-amber-900 py-2 px-4 rounded text-sm font-medium transition-colors border border-amber-300 shadow-sm active:bg-amber-300">
+                            + Tambah NO<sub>2</sub>
+                        </button>
+                    </div>
+                    
+                    <button id="resetBtn" class="w-full bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded text-sm font-medium transition-colors border border-red-200">
+                        Reset Wadah
+                    </button>
+                </div>
+
+                <div class="bg-blue-50 p-5 rounded-lg border border-blue-100 shadow-sm flex-1">
+                    <h3 class="font-bold text-blue-900 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Catatan
+                    </h3>
+                    <div class="text-sm text-blue-800 space-y-3 leading-relaxed">
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>Reaksi terjadi di dalam <strong>gelas kimia tertutup</strong> agar gas tidak lolos, sehingga sistem mencapai kesetimbangan.</li>
+                            <li>Warna latar belakang di dalam gelas kimia akan berubah menjadi kecoklatan seiring dengan bertambahnya konsentrasi gas <strong>NO<sub>2</sub></strong>.</li>
+                            <li>Pemanasan (suhu tinggi) akan menggeser kesetimbangan ke arah pembentukan NO<sub>2</sub> yang bersifat endoterm.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const n2o4CountEl = document.getElementById('n2o4Count');
+        const no2CountEl = document.getElementById('no2Count');
+        const n2o4BarEl = document.getElementById('n2o4Bar');
+        const no2BarEl = document.getElementById('no2Bar');
+        const tempSlider = document.getElementById('tempSlider');
+        
+        let width, height;
+        let molecules = [];
+        let animationId;
+        
+        // Konstanta Fisika & Reaksi
+        const ATOM_RADIUS_N = 8;
+        const ATOM_RADIUS_O = 6;
+        let baseSpeed = 1.5;
+        
+        // Termodinamika
+        let probDecompose = 0.001; 
+        let probCombine = 0.5;   
+
+        // Batas Gelas Kimia (Beaker Boundaries)
+        let bounds = { left: 0, right: 0, top: 0, bottom: 0 };
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            width = canvas.width;
+            height = canvas.height;
+
+            // Tentukan ukuran gelas kimia secara dinamis
+            let beakerWidth = Math.min(width * 0.7, 350);
+            bounds.left = (width - beakerWidth) / 2;
+            bounds.right = (width + beakerWidth) / 2;
+            bounds.top = 120; // Ruang lebih banyak untuk sumbat karet
+            bounds.bottom = height - 40;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawBeaker(brownIntensity) {
+            const bWidth = bounds.right - bounds.left;
+            const bHeight = bounds.bottom - bounds.top;
+            const cornerRadius = 15;
+
+            // 1. Latar Belakang / Kedalaman Gelas (Bagian Kaca Belakang)
+            ctx.fillStyle = 'rgba(230, 240, 245, 0.15)';
+            ctx.beginPath();
+            ctx.moveTo(bounds.left, bounds.top);
+            ctx.lineTo(bounds.left, bounds.bottom - cornerRadius);
+            ctx.quadraticCurveTo(bounds.left, bounds.bottom, bounds.left + cornerRadius, bounds.bottom);
+            ctx.lineTo(bounds.right - cornerRadius, bounds.bottom);
+            ctx.quadraticCurveTo(bounds.right, bounds.bottom, bounds.right, bounds.bottom - cornerRadius);
+            ctx.lineTo(bounds.right, bounds.top);
+            ctx.fill();
+
+            // 2. Gambar isi gas (Warna Coklat NO2)
+            ctx.fillStyle = `rgba(180, 80, 0, ${brownIntensity})`;
+            ctx.beginPath();
+            ctx.moveTo(bounds.left, bounds.top);
+            ctx.lineTo(bounds.left, bounds.bottom - cornerRadius);
+            ctx.quadraticCurveTo(bounds.left, bounds.bottom, bounds.left + cornerRadius, bounds.bottom);
+            ctx.lineTo(bounds.right - cornerRadius, bounds.bottom);
+            ctx.quadraticCurveTo(bounds.right, bounds.bottom, bounds.right, bounds.bottom - cornerRadius);
+            ctx.lineTo(bounds.right, bounds.top);
+            ctx.fill();
+
+            // 3. Markings (Skala Volume Gelas Kimia)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.lineWidth = 1.5;
+            ctx.textBaseline = 'middle';
+            
+            // Logo / Merk Gelas Lab
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 18px "Inter", sans-serif';
+            ctx.fillText("BOROSILICATE", (bounds.left + bounds.right)/2, bounds.top + 60);
+            ctx.font = 'bold 10px "Inter", sans-serif';
+            ctx.fillText("APPROX VOL.", (bounds.left + bounds.right)/2, bounds.top + 78);
+            
+            const numMarks = 5;
+            const markSpacing = (bHeight - 110) / numMarks;
+            
+            ctx.textAlign = 'right';
+            ctx.font = 'bold 13px "Inter", sans-serif';
+            for(let i = 1; i <= numMarks; i++) {
+                let yPos = bounds.bottom - 30 - (i * markSpacing);
+                ctx.beginPath();
+                ctx.moveTo(bounds.left + 25, yPos);
+                
+                let isMajor = i % 2 !== 0;
+                let markLength = isMajor ? 30 : 15;
+                ctx.lineTo(bounds.left + 25 + markLength, yPos);
+                ctx.stroke();
+                
+                if (isMajor) {
+                    ctx.fillText(`${i * 50}`, bounds.left + 20, yPos);
+                }
+            }
+            
+            // Tambahan tulisan 'ml' di atas skala
+            ctx.fillText("ml", bounds.left + 45, bounds.bottom - 30 - ((numMarks + 0.7) * markSpacing));
+
+            // 4. Kaca Depan (Glass Highlight/Gradient 3D Silinder)
+            let glassGrad = ctx.createLinearGradient(bounds.left, 0, bounds.right, 0);
+            glassGrad.addColorStop(0, 'rgba(255, 255, 255, 0.7)'); // Pantulan terang kiri
+            glassGrad.addColorStop(0.1, 'rgba(255, 255, 255, 0.1)');
+            glassGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.0)'); // Transparan di tengah
+            glassGrad.addColorStop(0.85, 'rgba(255, 255, 255, 0.05)');
+            glassGrad.addColorStop(0.95, 'rgba(255, 255, 255, 0.6)'); // Pantulan terang kanan
+            glassGrad.addColorStop(1, 'rgba(150, 200, 220, 0.4)'); // Tepi kaca agak kebiruan
+
+            ctx.fillStyle = glassGrad;
+            ctx.beginPath();
+            ctx.moveTo(bounds.left, bounds.top);
+            ctx.lineTo(bounds.left, bounds.bottom - cornerRadius);
+            ctx.quadraticCurveTo(bounds.left, bounds.bottom, bounds.left + cornerRadius, bounds.bottom);
+            ctx.lineTo(bounds.right - cornerRadius, bounds.bottom);
+            ctx.quadraticCurveTo(bounds.right, bounds.bottom, bounds.right, bounds.bottom - cornerRadius);
+            ctx.lineTo(bounds.right, bounds.top);
+            ctx.fill();
+
+            // 5. Ketebalan Dinding Kaca (Double Outline)
+            // Outline luar (Tebal, efek kaca)
+            ctx.strokeStyle = 'rgba(200, 220, 230, 0.7)';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(bounds.left, bounds.top);
+            ctx.lineTo(bounds.left, bounds.bottom - cornerRadius);
+            ctx.quadraticCurveTo(bounds.left, bounds.bottom, bounds.left + cornerRadius, bounds.bottom);
+            ctx.lineTo(bounds.right - cornerRadius, bounds.bottom);
+            ctx.quadraticCurveTo(bounds.right, bounds.bottom, bounds.right, bounds.bottom - cornerRadius);
+            ctx.lineTo(bounds.right, bounds.top);
+            ctx.stroke();
+            
+            // Outline dalam (Tipis, highlight cahaya putih)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(bounds.left + 3, bounds.top);
+            ctx.lineTo(bounds.left + 3, bounds.bottom - cornerRadius);
+            ctx.quadraticCurveTo(bounds.left + 3, bounds.bottom - 3, bounds.left + cornerRadius, bounds.bottom - 3);
+            ctx.lineTo(bounds.right - cornerRadius, bounds.bottom - 3);
+            ctx.quadraticCurveTo(bounds.right - 3, bounds.bottom - 3, bounds.right - 3, bounds.bottom - cornerRadius);
+            ctx.lineTo(bounds.right - 3, bounds.top);
+            ctx.stroke();
+
+            // Bayangan dasar gelas agar terlihat nyata menapak meja
+            let shadowGrad = ctx.createRadialGradient((bounds.left+bounds.right)/2, bounds.bottom, 10, (bounds.left+bounds.right)/2, bounds.bottom, bWidth/1.2);
+            shadowGrad.addColorStop(0, 'rgba(0,0,0,0.15)');
+            shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = shadowGrad;
+            ctx.beginPath();
+            ctx.ellipse((bounds.left+bounds.right)/2, bounds.bottom + 2, bWidth/2, 8, 0, 0, Math.PI*2);
+            ctx.fill();
+
+            // 6. Sumbat Karet (Tapered Rubber Stopper)
+            const stopperH = 35;
+            const stopperTopW = bWidth + 12;
+            const stopperBotW = bWidth - 15;
+            const stopperY = bounds.top - stopperH;
+            
+            // Body sumbat karet
+            let stopperGrad = ctx.createLinearGradient(bounds.left, 0, bounds.right, 0);
+            stopperGrad.addColorStop(0, '#1e293b');
+            stopperGrad.addColorStop(0.3, '#64748b'); // Highlight tekstur karet
+            stopperGrad.addColorStop(0.6, '#334155');
+            stopperGrad.addColorStop(1, '#0f172a');
+            
+            ctx.fillStyle = stopperGrad;
+            ctx.beginPath();
+            // Masuk ke dalam gelas sedikit agar menancap erat
+            ctx.moveTo((bounds.left + bounds.right)/2 - stopperBotW/2, bounds.top + 8); 
+            ctx.lineTo((bounds.left + bounds.right)/2 + stopperBotW/2, bounds.top + 8); 
+            ctx.lineTo((bounds.left + bounds.right)/2 + stopperTopW/2, stopperY); 
+            ctx.lineTo((bounds.left + bounds.right)/2 - stopperTopW/2, stopperY); 
+            ctx.closePath();
+            ctx.fill();
+
+            // Tekstur/Garis Karet horizontal pada sumbat
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo((bounds.left + bounds.right)/2 - (stopperTopW+stopperBotW)/4.2, stopperY + stopperH/2);
+            ctx.lineTo((bounds.left + bounds.right)/2 + (stopperTopW+stopperBotW)/4.2, stopperY + stopperH/2);
+            ctx.stroke();
+
+            // Top cap sumbat karet (Bentuk Elips)
+            ctx.fillStyle = '#334155';
+            ctx.beginPath();
+            ctx.ellipse((bounds.left + bounds.right)/2, stopperY, stopperTopW/2, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 7. Bibir Gelas (Beaker Rim / Flared Top)
+            ctx.fillStyle = 'rgba(235, 245, 255, 0.5)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.lineWidth = 3;
+            
+            // Elips bibir gelas atas
+            ctx.beginPath();
+            ctx.ellipse((bounds.left + bounds.right)/2, bounds.top, bWidth/2 + 8, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            
+            // Corong tuang kecil (Spout) di bagian pinggir kanan bibir gelas
+            ctx.beginPath();
+            ctx.moveTo(bounds.right + 6, bounds.top - 2);
+            ctx.quadraticCurveTo(bounds.right + 20, bounds.top + 2, bounds.right + 7, bounds.top + 8);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.fill();
+        }
+
+        class Molecule {
+            constructor(type, x, y, vx, vy) {
+                this.type = type; 
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.angle = Math.random() * Math.PI * 2;
+                this.angularVelocity = (Math.random() - 0.5) * 0.1;
+                this.markedForDeletion = false;
+                
+                this.radius = type === 'N2O4' ? 18 : 12;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                const colorN = '#2563eb'; 
+                const colorO = '#dc2626'; 
+                
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+
+                if (this.type === 'NO2') {
+                    const bondLength = 12;
+                    const angleO1 = Math.PI / 6; 
+                    const angleO2 = (5 * Math.PI) / 6; 
+
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(Math.cos(angleO1) * bondLength, Math.sin(angleO1) * bondLength);
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(Math.cos(angleO2) * bondLength, Math.sin(angleO2) * bondLength);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.arc(Math.cos(angleO1) * bondLength, Math.sin(angleO1) * bondLength, ATOM_RADIUS_O, 0, Math.PI * 2);
+                    ctx.fillStyle = colorO;
+                    ctx.fill(); ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.arc(Math.cos(angleO2) * bondLength, Math.sin(angleO2) * bondLength, ATOM_RADIUS_O, 0, Math.PI * 2);
+                    ctx.fillStyle = colorO;
+                    ctx.fill(); ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.arc(0, 0, ATOM_RADIUS_N, 0, Math.PI * 2);
+                    ctx.fillStyle = colorN;
+                    ctx.fill(); ctx.stroke();
+
+                } else if (this.type === 'N2O4') {
+                    const nDist = 7;
+                    const bondLength = 10;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(-nDist, 0);
+                    ctx.lineTo(nDist, 0);
+                    
+                    ctx.moveTo(-nDist, 0);
+                    ctx.lineTo(-nDist - bondLength*0.7, -bondLength*0.7);
+                    ctx.moveTo(-nDist, 0);
+                    ctx.lineTo(-nDist - bondLength*0.7, bondLength*0.7);
+                    
+                    ctx.moveTo(nDist, 0);
+                    ctx.lineTo(nDist + bondLength*0.7, -bondLength*0.7);
+                    ctx.moveTo(nDist, 0);
+                    ctx.lineTo(nDist + bondLength*0.7, bondLength*0.7);
+                    ctx.stroke();
+
+                    ctx.fillStyle = colorO;
+                    [ [-nDist - bondLength*0.7, -bondLength*0.7], 
+                      [-nDist - bondLength*0.7, bondLength*0.7],
+                      [nDist + bondLength*0.7, -bondLength*0.7],
+                      [nDist + bondLength*0.7, bondLength*0.7] ].forEach(pos => {
+                        ctx.beginPath();
+                        ctx.arc(pos[0], pos[1], ATOM_RADIUS_O, 0, Math.PI * 2);
+                        ctx.fill(); ctx.stroke();
+                    });
+
+                    ctx.fillStyle = colorN;
+                    ctx.beginPath();
+                    ctx.arc(-nDist, 0, ATOM_RADIUS_N, 0, Math.PI * 2);
+                    ctx.fill(); ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.arc(nDist, 0, ATOM_RADIUS_N, 0, Math.PI * 2);
+                    ctx.fill(); ctx.stroke();
+                }
+
+                ctx.restore();
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.angle += this.angularVelocity;
+
+                // Pantulan dinding kiri & kanan gelas kimia
+                if (this.x - this.radius < bounds.left) {
+                    this.x = bounds.left + this.radius;
+                    this.vx *= -1;
+                } else if (this.x + this.radius > bounds.right) {
+                    this.x = bounds.right - this.radius;
+                    this.vx *= -1;
+                }
+
+                // Pantulan dasar gelas & atap (sumbat penutup)
+                if (this.y - this.radius < bounds.top) {
+                    this.y = bounds.top + this.radius;
+                    this.vy *= -1;
+                } else if (this.y + this.radius > bounds.bottom) {
+                    this.y = bounds.bottom - this.radius;
+                    this.vy *= -1;
+                }
+            }
+        }
+
+        function checkCollisionsAndReactions() {
+            let newMolecules = [];
+            
+            for (let i = 0; i < molecules.length; i++) {
+                let m1 = molecules[i];
+                if (m1.markedForDeletion) continue;
+
+                if (m1.type === 'N2O4' && Math.random() < probDecompose) {
+                    m1.markedForDeletion = true;
+                    let angle = Math.random() * Math.PI * 2;
+                    let speedOffset = 1.5;
+                    newMolecules.push(new Molecule('NO2', m1.x + Math.cos(angle)*5, m1.y + Math.sin(angle)*5, m1.vx + Math.cos(angle)*speedOffset, m1.vy + Math.sin(angle)*speedOffset));
+                    newMolecules.push(new Molecule('NO2', m1.x - Math.cos(angle)*5, m1.y - Math.sin(angle)*5, m1.vx - Math.cos(angle)*speedOffset, m1.vy - Math.sin(angle)*speedOffset));
+                    continue; 
+                }
+
+                for (let j = i + 1; j < molecules.length; j++) {
+                    let m2 = molecules[j];
+                    if (m2.markedForDeletion) continue;
+
+                    let dx = m2.x - m1.x;
+                    let dy = m2.y - m1.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    let minDist = m1.radius + m2.radius;
+
+                    if (dist < minDist) {
+                        if (m1.type === 'NO2' && m2.type === 'NO2' && Math.random() < probCombine) {
+                            m1.markedForDeletion = true;
+                            m2.markedForDeletion = true;
+                            let newVx = (m1.vx + m2.vx) / 2;
+                            let newVy = (m1.vy + m2.vy) / 2;
+                            let newX = (m1.x + m2.x) / 2;
+                            let newY = (m1.y + m2.y) / 2;
+                            newMolecules.push(new Molecule('N2O4', newX, newY, newVx, newVy));
+                            break; 
+                        } else {
+                            let angle = Math.atan2(dy, dx);
+                            let targetX = m1.x + Math.cos(angle) * minDist;
+                            let targetY = m1.y + Math.sin(angle) * minDist;
+                            let ax = (targetX - m2.x) * 0.1;
+                            let ay = (targetY - m2.y) * 0.1;
+
+                            m1.vx -= ax;
+                            m1.vy -= ay;
+                            m2.vx += ax;
+                            m2.vy += ay;
+                            
+                            m1.x -= ax;
+                            m1.y -= ay;
+                            m2.x += ax;
+                            m2.y += ay;
+                        }
+                    }
+                }
+            }
+
+            molecules = molecules.filter(m => !m.markedForDeletion);
+            molecules = molecules.concat(newMolecules);
+        }
+
+        function getTotals() {
+            let n2o4Count = 0, no2Count = 0;
+            molecules.forEach(m => {
+                if (m.type === 'N2O4') n2o4Count++;
+                else no2Count++;
+            });
+            return { n2o4Count, no2Count };
+        }
+
+        function updateUI(totals) {
+            n2o4CountEl.textContent = totals.n2o4Count;
+            no2CountEl.textContent = totals.no2Count;
+
+            let total = totals.n2o4Count + totals.no2Count;
+            if (total === 0) total = 1; 
+
+            let totalMax = Math.max(total, 50); 
+            n2o4BarEl.style.width = `${(totals.n2o4Count / totalMax) * 100}%`;
+            no2BarEl.style.width = `${(totals.no2Count / totalMax) * 100}%`;
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Hitung komposisi gas untuk intensitas warna
+            const totals = getTotals();
+            let totalMax = Math.max(totals.n2o4Count + totals.no2Count, 1);
+            let brownIntensity = Math.min((totals.no2Count / (totalMax*2)) * 0.7, 0.85); 
+            
+            // Gambar Gelas Kimia di Latar Belakang
+            drawBeaker(brownIntensity);
+
+            checkCollisionsAndReactions();
+
+            molecules.forEach(m => {
+                let speed = Math.sqrt(m.vx*m.vx + m.vy*m.vy);
+                let targetSpeed = m.type === 'NO2' ? baseSpeed * 1.4 : baseSpeed * 0.8; 
+                
+                if (speed > 0) {
+                    m.vx = (m.vx / speed) * targetSpeed;
+                    m.vy = (m.vy / speed) * targetSpeed;
+                }
+
+                m.update();
+                m.draw();
+            });
+
+            updateUI(totals);
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function addMolecule(type, count) {
+            // Pastikan ditambahkan hanya di DALAM gelas kimia
+            const spawnW = bounds.right - bounds.left - 40;
+            const spawnH = bounds.bottom - bounds.top - 40;
+
+            for(let i=0; i<count; i++) {
+                let x = Math.random() * spawnW + bounds.left + 20;
+                let y = Math.random() * spawnH + bounds.top + 20;
+                let angle = Math.random() * Math.PI * 2;
+                let vx = Math.cos(angle) * baseSpeed;
+                let vy = Math.sin(angle) * baseSpeed;
+                molecules.push(new Molecule(type, x, y, vx, vy));
+            }
+        }
+
+        document.getElementById('addN2O4Btn').addEventListener('click', () => addMolecule('N2O4', 5));
+        document.getElementById('addNO2Btn').addEventListener('click', () => addMolecule('NO2', 5));
+        
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            molecules = [];
+            init();
+        });
+
+        tempSlider.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value); 
+            
+            baseSpeed = 1.0 + (val / 50); 
+            probDecompose = 0.0005 + (val / 100) * 0.01; 
+            probCombine = 0.8 - (val / 100) * 0.6;
+        });
+
+        function init() {
+            resizeCanvas();
+            tempSlider.dispatchEvent(new Event('input'));
+            addMolecule('N2O4', 20);
+            
+            if (animationId) cancelAnimationFrame(animationId);
+            animate();
+        }
+
+        window.onload = init;
+
+    </script>
+</body>
+</html>

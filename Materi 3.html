@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EquiChem – Asas Le Chatelier</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#1a2350;--mu:#6b7499;--bd:#e1e5f2;--pr:#142a6e;--gr:#1f7a45;--grb:#e8f6ee;--rd:#c0392b;--hd:#142a6e;--hdt:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1226;--card:#181c36;--tx:#e8ebff;--mu:#9aa3cc;--bd:#2b3159;--pr:#8fa6ff;--gr:#5fd392;--grb:#15302a;--rd:#ff8a7a;--hd:#2a3470;--hdt:#fff}}
+:root[data-theme="dark"]{--bg:#0f1226;--card:#181c36;--tx:#e8ebff;--mu:#9aa3cc;--bd:#2b3159;--pr:#8fa6ff;--gr:#5fd392;--grb:#15302a;--rd:#ff8a7a;--hd:#2a3470;--hdt:#fff}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:var(--hd);color:var(--hdt);padding:18px 16px}
+header h1{margin:0;font-size:22px}header p{margin:2px 0 0;opacity:.8;font-size:14px}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+nav button{white-space:nowrap;border:1px solid var(--bd);background:var(--bg);color:var(--tx);padding:8px 13px;border-radius:20px;cursor:pointer;font:inherit;font-size:14px}
+nav button.on{background:var(--pr);color:var(--bg);border-color:var(--pr);font-weight:600}
+main{max-width:900px;margin:0 auto;padding:14px}
+section{display:block;scroll-margin-top:70px}#s0{display:none}header,nav{display:none}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:14px}
+h2{margin:0 0 8px;font-size:20px;color:var(--pr)}h3{margin:0 0 6px;font-size:17px;color:var(--pr)}
+.tag{display:inline-block;background:var(--grb);color:var(--gr);font-weight:700;font-size:12px;letter-spacing:.05em;padding:4px 12px;border-radius:20px;margin-bottom:8px}
+.sub{color:var(--mu);font-size:14px}.g{color:var(--gr);font-weight:700}
+.it{border:1px solid var(--bd);border-radius:12px;padding:10px 14px;margin-top:8px}
+.it b{color:var(--gr)}
+.note{background:var(--grb);border-left:4px solid var(--gr);padding:10px 14px;border-radius:8px;margin-top:10px;font-size:15px}
+table{border-collapse:collapse;width:100%;font-size:15px}th{background:var(--hd);color:var(--hdt);text-align:left}th,td{padding:8px 10px;border:1px solid var(--bd)}
+.scroll{overflow-x:auto}
+button.b{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:8px 12px;cursor:pointer;font:inherit;font-size:14px}
+button.b:hover{border-color:var(--pr)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.grp{flex:1 1 200px;border:1px solid var(--bd);border-radius:12px;padding:10px}
+.grp small{display:block;color:var(--mu);font-weight:700;margin-bottom:6px;font-size:12px;letter-spacing:.04em}
+canvas{width:100%;max-width:520px;background:var(--bg);border:1px solid var(--bd);border-radius:12px;display:block;margin:auto}
+.stat{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.stat div{flex:1 1 90px;background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:6px 10px;font-size:13px;text-align:center}
+.stat b{display:block;font-size:17px;color:var(--pr)}
+#msg{background:var(--grb);color:var(--tx);border-radius:10px;padding:10px 14px;margin:8px 0;min-height:48px}
+details{border:1px solid var(--bd);border-radius:10px;padding:8px 12px;margin-top:8px}summary{cursor:pointer;font-weight:600}
+select{font:inherit;padding:5px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx)}
+.ok{color:var(--gr);font-weight:700}.no{color:var(--rd);font-weight:700}
+.opt{display:block;width:100%;text-align:left;margin-top:6px}
+.leg span{display:inline-block;width:12px;height:12px;border-radius:50%;margin:0 4px 0 10px;vertical-align:middle}
+</style></head><body>
+<header><h1>⚗️ EquiChem</h1><p>Micro Modul Kesetimbangan Kimia – Asas Le Chatelier</p></header>
+<nav id="nav"></nav>
+<main>
+
+<section id="s0"><div class="card"><span class="tag">TUJUAN PEMBELAJARAN</span>
+<ol>
+<li>Melalui diskusi kelompok, peserta didik dapat menjelaskan konsep asas Le Chatelier dan faktor-faktor yang memengaruhi pergeseran kesetimbangan dengan tepat.</li>
+<li>Melalui simulasi interaktif EquiChem, peserta didik dapat menganalisis pengaruh perubahan suhu, tekanan, dan volume terhadap pergeseran kesetimbangan dengan kesimpulan yang akurat.</li>
+<li>Setelah mempelajari contoh penerapan, peserta didik mampu menghubungkan konsep kesetimbangan kimia dengan proses kehidupan dan industri.</li>
+<li>Melalui simulasi atau pengamatan, peserta didik mampu menentukan arah pergeseran akibat perubahan konsentrasi, tekanan/volume, dan suhu secara sistematis.</li></ol>
+<div class="note"><b>Alur belajar (gulir ke bawah, semua dalam satu halaman):</b> Materi → Simulasi → Diskusi → Penerapan → Latihan pengamatan → Kuis → Ringkasan.</div></div></section>
+
+<section id="s1">
+<div class="card"><span class="tag">PRASYARAT KONSEP</span>
+<h3>Kesetimbangan dinamis &amp; asas Le Chatelier</h3>
+<p>Pada reaksi reversibel dalam sistem tertutup, laju reaksi maju sama dengan laju reaksi balik sehingga konsentrasi zat tidak berubah (tampak diam, padahal reaksi terus berlangsung = <i>dinamis</i>).</p>
+<div class="note"><b>Asas Le Chatelier:</b> jika pada sistem kesetimbangan diberi aksi (gangguan), sistem akan bergeser ke arah yang mengurangi pengaruh aksi tersebut sampai tercapai kesetimbangan baru.</div>
+<div class="it"><b>Kuosien reaksi (Q) vs tetapan (K).</b> Q dihitung seperti K tetapi dengan konsentrasi sesaat. Jika Q &lt; K → bergeser ke kanan; Q &gt; K → bergeser ke kiri; Q = K → setimbang.</div></div>
+
+<div class="card"><span class="tag">A. FAKTOR YANG MEMENGARUHI KESETIMBANGAN</span>
+<h3>1. Perubahan Konsentrasi</h3><p class="sub">Contoh: N₂O₄(g) ⇌ 2NO₂(g) (tak berwarna ⇌ cokelat kemerahan)</p>
+<div class="it"><b>Menambah NO₂ (produk)</b><br>Bergeser ke <b>kiri</b> (membentuk N₂O₄). Warna cokelat memudar.</div>
+<div class="it"><b>Mengurangi NO₂ (produk)</b><br>Bergeser ke <b>kanan</b> (membentuk NO₂). Warna cokelat menebal.</div>
+<div class="note">Aturan umum: menambah zat → bergeser menjauhi zat itu; mengurangi zat → bergeser mendekati zat itu. Zat padat dan cairan murni tidak memengaruhi K maupun arah pergeseran. Nilai K <b>tidak berubah</b>.</div></div>
+
+<div class="card"><h3>2. Perubahan Suhu</h3><p class="sub">Contoh: N₂O₄(g) ⇌ 2NO₂(g), ΔH &gt; 0 (endoterm)</p>
+<div class="it"><b>Suhu dinaikkan</b><br>Bergeser ke <b>kanan</b> (arah endoterm). Warna cokelat menebal.</div>
+<div class="it"><b>Suhu diturunkan</b><br>Bergeser ke <b>kiri</b> (arah eksoterm). Warna cokelat memudar.</div>
+<div class="note">Hanya suhu yang mengubah <b>nilai K</b>. Endoterm: suhu naik → K naik. Eksoterm: suhu naik → K turun. Hubungan kuantitatifnya dinyatakan persamaan van’t Hoff: ln(K₂/K₁) = −ΔH/R · (1/T₂ − 1/T₁).</div></div>
+
+<div class="card"><h3>3. Perubahan Tekanan / Volume (sistem gas)</h3><p class="sub">Contoh: 2SO₂(g) + O₂(g) ⇌ 2SO₃(g)</p>
+<div class="it"><b>Tekanan dinaikkan</b> (volume diperkecil)<br>Bergeser ke <b>kanan</b> – arah jumlah mol gas lebih sedikit (3 mol → 2 mol).</div>
+<div class="it"><b>Tekanan diturunkan</b> (volume diperbesar)<br>Bergeser ke <b>kiri</b> – arah jumlah mol gas lebih banyak.</div>
+<div class="note">Jika jumlah mol gas ruas kiri = kanan (misal H₂ + I₂ ⇌ 2HI), perubahan tekanan/volume <b>tidak menggeser</b> kesetimbangan. Penambahan gas inert pada volume tetap juga tidak menggeser, karena konsentrasi pereaksi tidak berubah.</div></div>
+
+<div class="card"><h3>4. Katalis</h3>
+<p>Katalis mempercepat tercapainya kesetimbangan (laju maju dan balik dipercepat sama besar) tetapi <b>tidak menggeser</b> kesetimbangan dan tidak mengubah nilai K, karena hanya menurunkan energi aktivasi.</p></div>
+</section>
+
+<section id="s2"><div class="card"><h2>🧪 Simulasi Virtual: Sintesis Amonia</h2>
+<div style="text-align:center;font-size:19px;font-weight:700;margin:6px 0">N₂(g) + 3H₂(g) ⇌ 2NH₃(g) &nbsp; ΔH = −92 kJ</div>
+<div class="leg sub" style="text-align:center"><span style="background:#2f6fe4"></span>N₂<span style="background:#cfd5e6;border:1px solid #8890aa"></span>H₂<span style="background:#a755d6"></span>NH₃</div>
+<canvas id="cv" width="520" height="360"></canvas>
+<div class="stat"><div>[N₂]<b id="cN">-</b></div><div>[H₂]<b id="cH">-</b></div><div>[NH₃]<b id="cA">-</b></div><div>Q<b id="vQ">-</b></div><div>K<b id="vK">-</b></div><div>T<b id="vT">-</b></div><div>V<b id="vV">-</b></div></div>
+<div id="msg">Sistem dalam keadaan setimbang. Pilih sebuah aksi di bawah.</div>
+<div class="row">
+<div class="grp"><small>1. KONSENTRASI</small><button class="b" onclick="act('N',4)">+ N₂</button> <button class="b" onclick="act('N',-3)">− N₂</button> <button class="b" onclick="act('H',4)">+ H₂</button> <button class="b" onclick="act('H',-4)">− H₂</button> <button class="b" onclick="act('A',4)">+ NH₃</button> <button class="b" onclick="act('A',-4)">− NH₃</button></div>
+<div class="grp"><small>2. SUHU</small><button class="b" onclick="temp(50)">🔥 Naikkan</button> <button class="b" onclick="temp(-50)">❄️ Turunkan</button></div>
+<div class="grp"><small>3. TEKANAN / VOLUME</small><button class="b" onclick="vol(.5)">⬆ Tekanan naik (V↓)</button> <button class="b" onclick="vol(2)">⬇ Tekanan turun (V↑)</button></div>
+<div class="grp"><small>4. KATALIS</small><button class="b" id="catb" onclick="cat()">Tambahkan katalis (Fe)</button></div>
+</div>
+<button class="b" onclick="reset()">🔄 Reset simulasi</button>
+<details><summary>📖 Petunjuk</summary><p>Berikan satu gangguan, amati jumlah partikel, nilai Q dibanding K, lalu catat arah pergeseran pada tab Latihan. Konsentrasi dihitung dari mol ÷ volume. Tutup gelas dapat bergerak: tekanan naik → tutup turun (volume mengecil), tekanan turun → tutup naik. Pada simulasi ini ruas kanan (2 mol gas) lebih sedikit daripada ruas kiri (4 mol gas).</p></details></div></section>
+
+<section id="s3"><div class="card"><span class="tag">DISKUSI KELOMPOK</span><h2>Tugas diskusi (3–4 orang)</h2>
+<p class="sub">Diskusikan lebih dulu, baru buka kunci jawaban.</p>
+<details><summary>1. Mengapa kesetimbangan disebut “dinamis”, padahal warna dan konsentrasi tidak berubah?</summary><p>Reaksi maju dan balik tetap berlangsung dengan laju sama, sehingga tidak ada perubahan makroskopis.</p></details>
+<details><summary>2. Jelaskan dengan kata-katamu sendiri bunyi asas Le Chatelier dan beri satu contoh dari kehidupan sehari-hari.</summary><p>Sistem melawan gangguan. Contoh: membuka botol minuman bersoda menurunkan tekanan, CO₂ terlepas (kesetimbangan bergeser ke arah gas).</p></details>
+<details><summary>3. Pada N₂O₄ ⇌ 2NO₂ (ΔH &gt; 0), apa yang terjadi bila tabung dicelup air es? Jelaskan arah dan warnanya.</summary><p>Suhu turun, bergeser ke arah eksoterm (kiri), N₂O₄ bertambah, warna cokelat memudar.</p></details>
+<details><summary>4. Mengapa katalis dipakai di industri bila tidak menggeser kesetimbangan?</summary><p>Katalis mempercepat tercapainya kesetimbangan sehingga produksi lebih cepat dan hemat energi, meski hasil akhir (K) tetap.</p></details>
+<details><summary>5. Pada H₂(g) + I₂(g) ⇌ 2HI(g), apa pengaruh menaikkan tekanan? Mengapa?</summary><p>Tidak ada pergeseran, karena jumlah mol gas kiri (2) = kanan (2).</p></details></div></section>
+
+<section id="s4"><div class="card"><span class="tag">C. PENERAPAN</span><h2>Kesetimbangan dalam industri dan kehidupan</h2>
+<div class="it"><b>1. Proses Haber–Bosch (amonia, pupuk urea)</b><br>N₂ + 3H₂ ⇌ 2NH₃, ΔH = −92 kJ. Tekanan tinggi (±150–300 atm) menggeser ke kanan (4 mol → 2 mol). Suhu rendah menguntungkan hasil (eksoterm), tetapi lambat, maka dipilih kompromi ±400–500 °C dengan katalis besi. NH₃ dikeluarkan terus-menerus (dicairkan) agar bergeser ke kanan.</div>
+<div class="it"><b>2. Proses Kontak (asam sulfat)</b><br>2SO₂ + O₂ ⇌ 2SO₃, ΔH &lt; 0. Katalis V₂O₅, suhu ±450 °C, tekanan sedikit di atas 1 atm (sudah cukup, hemat biaya), O₂ berlebih untuk menggeser ke kanan.</div>
+<div class="it"><b>3. Transpor oksigen dalam darah</b><br>Hb + O₂ ⇌ HbO₂. Di ketinggian, tekanan O₂ rendah, kesetimbangan bergeser ke kiri sehingga tubuh kekurangan oksigen; tubuh beradaptasi dengan menambah sel darah merah.</div>
+<div class="it"><b>4. Minuman bersoda</b><br>CO₂(g) + H₂O(l) ⇌ H₂CO₃(aq). Tutup dibuka → tekanan turun → bergeser ke kiri → gelembung CO₂ keluar. Minuman dingin menyimpan CO₂ lebih lama.</div>
+<div class="it"><b>5. Stalaktit &amp; stalagmit, serta terumbu karang</b><br>CaCO₃(s) + CO₂ + H₂O ⇌ Ca²⁺ + 2HCO₃⁻. Perubahan CO₂ terlarut menggeser kesetimbangan sehingga kapur larut atau mengendap. Peningkatan CO₂ di laut (pengasaman) mengganggu pembentukan cangkang karang.</div>
+<div class="note"><b>Tugas refleksi:</b> pilih satu penerapan, tentukan reaksinya, ΔH, jumlah mol gas, lalu jelaskan kondisi yang dipilih menggunakan asas Le Chatelier.</div></div></section>
+
+<section id="s5"><div class="card"><span class="tag">D. LATIHAN PENGAMATAN</span><h2>Tentukan arah pergeseran</h2>
+<p class="sub">Reaksi: N₂(g) + 3H₂(g) ⇌ 2NH₃(g), ΔH = −92 kJ. Uji jawabanmu dengan simulasi, lalu periksa.</p>
+<div class="scroll"><table id="lat"></table></div>
+<p id="latr" class="g"></p></div>
+<div class="card"><h3>Lembar pengamatan</h3><p class="sub">Salin tabel ini ke buku catatan: aksi, Q vs K, arah pergeseran, perubahan jumlah NH₃, kesimpulan. Rumuskan kesimpulan secara berurutan untuk konsentrasi, tekanan/volume, dan suhu.</p></div></section>
+
+<section id="s6"><div class="card"><span class="tag">KUIS</span><h2>Uji pemahaman</h2><div id="quiz"></div><p id="qs" class="g"></p></div></section>
+
+<section id="s7"><div class="card"><h2>📋 Ringkasan Aturan Le Chatelier</h2><div class="scroll"><table>
+<tr><th>Gangguan</th><th>Sistem bergeser ke arah…</th></tr>
+<tr><td>Konsentrasi ↑ zat</td><td>Menjauhi zat yang ditambah (mengurangi perubahan)</td></tr>
+<tr><td>Suhu ↑ / ↓</td><td>Endoterm (↑) / eksoterm (↓); K berubah</td></tr>
+<tr><td>Tekanan ↑ (V↓)</td><td>Jumlah mol gas lebih sedikit</td></tr>
+<tr><td>Tekanan ↓ (V↑)</td><td>Jumlah mol gas lebih banyak</td></tr>
+<tr><td>Katalis</td><td>Tidak menggeser, hanya mempercepat tercapainya kesetimbangan</td></tr></table></div></div></section>
+</main>
+<script>
+const tabs=["Materi","Simulasi","Diskusi","Penerapan","Latihan","Kuis","Ringkasan"];
+const nav=document.getElementById('nav');
+tabs.forEach((t,i)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>show(i);nav.appendChild(b)});
+function show(i){document.getElementById('s'+(i+1)).scrollIntoView({behavior:'smooth'})}
+
+/* ===== SIMULASI ===== */
+const R=8.314,T0=500;
+let n,V,T,K,Kref,catOn=false,tgt,parts={N:[],H:[],A:[]};
+const cv=document.getElementById('cv'),cx=cv.getContext('2d');
+const col={N:'#2f6fe4',H:'#cfd5e6',A:'#a755d6'},rad={N:9,H:5,A:8};
+const Qf=(x)=>{const a=(n.A+2*x)/V,b=(n.N-x)/V,c=(n.H-3*x)/V;return a*a/(b*c*c*c)};
+function reset(){n={N:4,H:12,A:8};V=10;T=T0;catOn=false;document.getElementById('catb').textContent='Tambahkan katalis (Fe)';
+ Kref=(n.A/V)**2/((n.N/V)*(n.H/V)**3);K=Kref;tgt={...n};say('Sistem dalam keadaan setimbang. Pilih sebuah aksi di bawah.');sync(true)}
+function Kt(){return Kref*Math.exp(92000/R*(1/T-1/T0))}
+function solve(){K=Kt();let lo=-n.A/2+1e-6,hi=Math.min(n.N,n.H/3)-1e-6;
+ for(let i=0;i<80;i++){const m=(lo+hi)/2;Qf(m)<K?lo=m:hi=m}
+ const x=(lo+hi)/2;tgt={N:n.N-x,H:n.H-3*x,A:n.A+2*x};return x}
+function say(t){document.getElementById('msg').innerHTML=t}
+function analyze(why){const Q=Qf(0),x=solve();let d;
+ if(Math.abs(x)<.02)d='<b>Tidak ada pergeseran</b> (Q = K).';
+ else d=x>0?'Q &lt; K → sistem <b>bergeser ke kanan</b> (NH₃ bertambah).':'Q &gt; K → sistem <b>bergeser ke kiri</b> (NH₃ berkurang).';
+ say(why+'<br>'+d);}
+function act(k,d){n[k]=Math.max(.2,n[k]+d);analyze((d>0?'Menambah ':'Mengurangi ')+{N:'N₂',H:'H₂',A:'NH₃'}[k]+'.');sync()}
+function temp(d){T=Math.min(700,Math.max(300,T+d));const x0=n;const x=(Kt()),why=(d>0?'Suhu dinaikkan':'Suhu diturunkan')+' → K '+(d>0?'turun':'naik')+' (reaksi eksoterm).';
+ K=Kt();const x1=solve();say(why+'<br>'+(Math.abs(x1)<.02?'Tidak bergeser.':x1>0?'Q &lt; K → <b>bergeser ke kanan</b>.':'Q &gt; K → <b>bergeser ke kiri</b> (arah endoterm, NH₃ berkurang).'));sync()}
+function vol(f){const nv=V*f;if(nv<2.4||nv>20.1){say('Volume sudah pada batas simulasi.');return}V=nv;
+ analyze(f<1?'Volume diperkecil → tekanan naik.':'Volume diperbesar → tekanan turun.');sync()}
+function cat(){catOn=!catOn;document.getElementById('catb').textContent=catOn?'Lepas katalis':'Tambahkan katalis (Fe)';
+ say(catOn?'Katalis ditambahkan: laju maju &amp; balik naik sama besar. <b>Tidak ada pergeseran</b>; kesetimbangan baru tercapai lebih cepat setelah gangguan.':'Katalis dilepas.')}
+function sync(init){if(init)solve0();document.getElementById('vT').textContent=T+' K';document.getElementById('vV').textContent=V.toFixed(1)}
+function solve0(){K=Kt();tgt={...n}}
+function fit(k){const p=parts[k],c=Math.round(n[k]);while(p.length<c)p.push(mk(k));while(p.length>c)p.pop()}
+function mk(k){return{x:10+Math.random()*190,y:10+Math.random()*90,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3}}
+function frame(){const f=catOn?.12:.03;for(const k in n)n[k]+=(tgt[k]-n[k])*f;
+ const hh=90+11*V,B=335,top=B-hh;cx.clearRect(0,0,520,360);
+ const mu=getComputedStyle(document.body).getPropertyValue('--mu')||'#888';
+ cx.strokeStyle=mu;cx.fillStyle=mu;cx.lineWidth=3;
+ for(const bx of[20,290]){cx.beginPath();cx.moveTo(bx,top);cx.lineTo(bx,B-12);cx.quadraticCurveTo(bx,B,bx+12,B);cx.lineTo(bx+198,B);cx.quadraticCurveTo(bx+210,B,bx+210,B-12);cx.lineTo(bx+210,top);cx.stroke();
+  cx.fillRect(bx-6,top-10,222,10);cx.fillRect(bx+95,top-18,20,8)}
+ cx.textAlign='center';cx.font='bold 28px sans-serif';cx.fillText('⇌',260,B-hh/2);
+ cx.font='12px sans-serif';cx.fillText('Gelas tertutup 1 (N₂ & H₂)',125,352);cx.fillText('Gelas tertutup 2 (NH₃)',395,352);
+ for(const k of['N','H','A']){fit(k);const bx=k=='A'?290:20,r=rad[k];for(const p of parts[k]){p.x+=p.vx*(T/500);p.y+=p.vy*(T/500);
+  if(p.x<r+4||p.x>206-r){p.vx*=-1;p.x=Math.min(Math.max(p.x,r+4),206-r)}
+  if(p.y<r+4||p.y>hh-r-3){p.vy*=-1;p.y=Math.min(Math.max(p.y,r+4),hh-r-3)}
+  cx.fillStyle=col[k];cx.beginPath();cx.arc(bx+p.x,top+p.y,r,0,7);cx.fill();
+  cx.fillStyle=k=='H'?'#333':'#fff';cx.font='bold 9px sans-serif';cx.fillText(k=='N'?'N':k=='H'?'H':'NH',bx+p.x,top+p.y+3)}}
+ const q=Qf(0);set('cN',n.N/V);set('cH',n.H/V);set('cA',n.A/V);
+ document.getElementById('vQ').textContent=q.toFixed(2);document.getElementById('vK').textContent=K.toFixed(2);
+ requestAnimationFrame(frame)}
+function set(id,v){document.getElementById(id).textContent=v.toFixed(2)}
+reset();for(const k of['N','H','A'])fit(k);frame();
+
+/* ===== LATIHAN ===== */
+const L=[["Menambah N₂","kanan"],["Mengurangi NH₃","kanan"],["Menambah NH₃","kiri"],["Tekanan dinaikkan (V diperkecil)","kanan"],["Volume diperbesar","kiri"],["Suhu dinaikkan","kiri"],["Suhu diturunkan","kanan"],["Menambah katalis","tetap"]];
+const lat=document.getElementById('lat');lat.innerHTML='<tr><th>No</th><th>Gangguan</th><th>Arah pergeseran</th><th></th></tr>';
+L.forEach((r,i)=>{lat.innerHTML+=`<tr><td>${i+1}</td><td>${r[0]}</td><td><select id="l${i}"><option value="">–pilih–</option><option>kanan</option><option>kiri</option><option>tetap</option></select></td><td id="r${i}"></td></tr>`});
+lat.innerHTML+='<tr><td colspan="4"><button class="b" onclick="chk()">Periksa jawaban</button></td></tr>';
+function chk(){let s=0;L.forEach((r,i)=>{const v=document.getElementById('l'+i).value,e=document.getElementById('r'+i);
+ if(v==r[1]){s++;e.innerHTML='<span class="ok">✓</span>'}else e.innerHTML='<span class="no">✗</span>'});
+ document.getElementById('latr').textContent='Skor: '+s+' / '+L.length+(s==L.length?' – Sempurna!':' – coba cek lagi dengan simulasi.')}
+
+/* ===== KUIS ===== */
+const Q=[["Menurut asas Le Chatelier, jika sistem setimbang diganggu maka sistem…",["tidak berubah","bergeser untuk mengurangi pengaruh gangguan","bergeser memperbesar gangguan","berhenti bereaksi"],1],
+["Pada N₂O₄ ⇌ 2NO₂ (ΔH &gt; 0), suhu dinaikkan, warna cokelat…",["memudar","menebal","tetap","hilang"],1],
+["2SO₂ + O₂ ⇌ 2SO₃. Tekanan dinaikkan, kesetimbangan bergeser ke…",["kiri","kanan","tetap","tak tentu"],1],
+["Pernyataan tentang katalis yang benar:",["menggeser ke kanan","menaikkan K","mempercepat tercapainya kesetimbangan","menurunkan hasil"],2],
+["Pada H₂ + I₂ ⇌ 2HI, volume diperkecil akan…",["bergeser kanan","bergeser kiri","tidak menggeser","K naik"],2],
+["Pada proses Haber, NH₃ dicairkan dan dikeluarkan agar…",["bergeser ke kiri","bergeser ke kanan","K turun","katalis aktif"],1]];
+let qa=0;const qz=document.getElementById('quiz');
+Q.forEach((q,i)=>{qz.innerHTML+=`<div class="it"><b style="color:inherit">${i+1}. ${q[0]}</b>`+q[1].map((o,j)=>`<button class="b opt" onclick="ans(this,${i},${j})">${o}</button>`).join('')+'</div>'});
+function ans(b,i,j){const p=b.parentNode;if(p.dataset.d)return;p.dataset.d=1;const ok=j==Q[i][2];qa+=ok?1:0;
+ b.innerHTML+=ok?' <span class="ok">✓</span>':' <span class="no">✗</span>';
+ if(!ok)p.querySelectorAll('button')[Q[i][2]].innerHTML+=' <span class="ok">✓ benar</span>';
+ document.getElementById('qs').textContent='Skor sementara: '+qa+' / '+Q.length}
+</script></body></html>

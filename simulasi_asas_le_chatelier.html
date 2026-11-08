@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Simulation - Asas Le Chatelier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #0f172a;
+        }
+
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .tab-button.active {
+            border-color: #10b981; /* Emerald 500 */
+            background-color: #ecfdf5; /* Emerald 50 */
+            color: #047857; /* Emerald 700 */
+            font-weight: 600;
+        }
+
+        /* Closed Beaker Styles with Lids */
+        .beaker-container {
+            position: relative;
+            width: 150px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .beaker {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 165px;
+            border: 3px solid #cbd5e1;
+            border-top: none;
+            border-radius: 0 0 24px 24px;
+            background: linear-gradient(to right, rgba(248,250,252,0.8) 0%, rgba(241,245,249,0.5) 100%);
+            overflow: hidden;
+            z-index: 10;
+        }
+        
+        .beaker-lid {
+            position: absolute;
+            top: 20px;
+            left: -6px;
+            width: calc(100% + 12px);
+            height: 14px;
+            background-color: #64748b;
+            border-radius: 6px;
+            z-index: 25;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .beaker-neck {
+            position: absolute;
+            top: 30px;
+            left: 35px;
+            width: 80px;
+            height: 10px;
+            background-color: #94a3b8;
+            z-index: 22;
+        }
+
+        .particles-area {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 8;
+        }
+
+        /* IUPAC Ball Styles */
+        .atom {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: bold;
+            color: white;
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.15);
+            transition: all 0.5s ease;
+        }
+
+        /* IUPAC Colors: Nitrogen = Blue (#3b82f6), Hydrogen = White/Light Cyan (#f1f5f9 with dark text), Ammonia complex or grouped */
+        .atom-n {
+            background: radial-gradient(circle at 30% 30%, #60a5fa, #2563eb);
+            width: 22px;
+            height: 22px;
+        }
+
+        .atom-h {
+            background: radial-gradient(circle at 30% 30%, #ffffff, #cbd5e1);
+            color: #1e293b;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #94a3b8;
+        }
+
+        .molecule-nh3 {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+        }
+
+        /* Custom Range Slider & Buttons */
+        .custom-btn {
+            transition: all 0.2s ease;
+        }
+        .custom-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        @keyframes pulse-arrow {
+            0% { transform: translateX(0); opacity: 0.6; }
+            50% { transform: translateX(8px); opacity: 1; }
+            100% { transform: translateX(0); opacity: 0.6; }
+        }
+        .animate-arrow-right {
+            animation: pulse-arrow 1s infinite;
+        }
+        @keyframes pulse-arrow-left {
+            0% { transform: translateX(0); opacity: 0.6; }
+            50% { transform: translateX(-8px); opacity: 1; }
+            100% { transform: translateX(0); opacity: 0.6; }
+        }
+        .animate-arrow-left {
+            animation: pulse-arrow-left 1s infinite;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex justify-center min-h-screen">
+    
+    <div class="max-w-4xl w-full bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col shadow-sm">
+        
+        <!-- Header -->
+        <div class="bg-white px-6 py-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">🧪</span>
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Interactive Simulation</h1>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="openModal('petunjukModal')" class="px-3 py-1.5 text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-lg transition border border-slate-200">
+                    📖 Petunjuk
+                </button>
+                <button onclick="resetSimulation()" class="px-3 py-1.5 text-sm font-medium text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition border border-rose-200">
+                    🔄 Reset Simulasi
+                </button>
+            </div>
+        </div>
+
+        <div class="p-6 flex-grow flex flex-col justify-between space-y-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button class="tab-button active border border-slate-200 rounded-xl py-3 px-4 text-center text-slate-700 bg-white shadow-sm hover:bg-slate-50 font-medium text-sm flex items-center justify-center space-x-2" onclick="switchTab('konsentrasi')">
+                    <span>1. Konsentrasi</span>
+                </button>
+                <button class="tab-button border border-slate-200 rounded-xl py-3 px-4 text-center text-slate-700 bg-white shadow-sm hover:bg-slate-50 font-medium text-sm flex items-center justify-center space-x-2" onclick="switchTab('suhu')">
+                    <span>2. Suhu</span>
+                </button>
+                <button class="tab-button border border-slate-200 rounded-xl py-3 px-4 text-center text-slate-700 bg-white shadow-sm hover:bg-slate-50 font-medium text-sm flex items-center justify-center space-x-2" onclick="switchTab('tekanan')">
+                    <span>3. Tekanan/Volume</span>
+                </button>
+                <button class="tab-button border border-slate-200 rounded-xl py-3 px-4 text-center text-slate-700 bg-white shadow-sm hover:bg-slate-50 font-medium text-sm flex items-center justify-center space-x-2" onclick="switchTab('katalis')">
+                    <span>4. Katalis</span>
+                </button>
+            </div>
+
+            <div class="bg-slate-50/70 border border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-between min-h-[440px]">
+                
+                <!-- Reaction Formula Banner -->
+                <div id="reaction-formula" class="bg-white px-6 py-2.5 rounded-full border border-slate-200 shadow-sm font-semibold text-slate-800 text-sm md:text-base mb-2">
+                    N₂(g) + 3H₂(g) ⇌ 2NH₃(g)
+                </div>
+
+                <!-- IUPAC Color Legend -->
+                <div class="flex items-center space-x-4 text-xs text-slate-600 mb-2 bg-white px-4 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
+                    <span class="font-medium">Aturan Warna IUPAC:</span>
+                    <div class="flex items-center space-x-1"><div class="w-3.5 h-3.5 rounded-full bg-blue-600 border border-blue-700"></div><span>N (Nitrogen - Biru)</span></div>
+                    <div class="flex items-center space-x-1"><div class="w-3.5 h-3.5 rounded-full bg-slate-100 border border-slate-400"></div><span>H (Hidrogen - Putih/Abu)</span></div>
+                </div>
+
+                <!-- Visual Beakers Workspace -->
+                <div id="visual-workspace" class="w-full flex flex-col md:flex-row items-center justify-center gap-6 my-2">
+                    <!-- Dynamic injection -->
+                </div>
+
+                <!-- Status Feedback Badge -->
+                <div id="status-badge" class="my-2 px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium flex items-center space-x-2">
+                    <span>💡</span>
+                    <span id="status-text">Sistem berada dalam keadaan setimbang sempurna.</span>
+                </div>
+
+                <!-- Controls Workspace -->
+                <div id="controls-workspace" class="w-full max-w-lg mt-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <!-- Dynamic injection -->
+                </div>
+            </div>
+
+            <div class="border border-slate-200 rounded-2xl p-5 bg-white shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-bold text-slate-900 text-base flex items-center space-x-2">
+                        <span>📚</span>
+                        <span>Konsep & Penjelasan Asas Le Chatelier</span>
+                    </h3>
+                    <button onclick="openModal('kesimpulanModal')" class="text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg border border-emerald-200 transition">
+                        Lihat Rangkuman Prinsip
+                    </button>
+                </div>
+                <p id="info-explanation" class="text-slate-600 text-sm md:text-base leading-relaxed">
+                    Pilih salah satu faktor di atas untuk menguji respons sistem kesetimbangan kimia terhadap gangguan eksternal.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Petunjuk Modal -->
+    <div id="petunjukModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-lg text-slate-900">📖 Petunjuk Penggunaan</h3>
+                <button onclick="closeModal('petunjukModal')" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+            </div>
+            <div class="space-y-2.5 text-sm text-slate-600 leading-relaxed">
+                <p>1. <strong>Pilih Faktor:</strong> Klik salah satu dari 4 tab (Konsentrasi, Suhu, Tekanan/Volume, atau Katalis).</p>
+                <p>2. <strong>Berikan Gangguan:</strong> Gunakan tombol interaktif atau kontrol untuk mengubah kondisi sistem dalam <strong>dua gelas kimia tertutup</strong>.</p>
+                <p>3. <strong>Amati Bola Partikel IUPAC:</strong> Perhatikan pergerakan bola nitrogen (biru) dan hidrogen (putih) yang berinteraksi membentuk amonia.</p>
+                <p>4. <strong>Reset Simulasi:</strong> Klik tombol Reset jika ingin mengembalikan kondisi awal.</p>
+            </div>
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeModal('petunjukModal')" class="px-4 py-2 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition text-sm">Mengerti</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kesimpulan Modal -->
+    <div id="kesimpulanModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-lg text-slate-900">✨ Prinsip Asas Le Chatelier</h3>
+                <button onclick="closeModal('kesimpulanModal')" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+            </div>
+            <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 text-sm md:text-base leading-relaxed font-medium">
+                “Jika suatu sistem kesetimbangan mengalami perubahan konsentrasi, suhu, tekanan, atau volume, sistem akan mengalami pergeseran yang cenderung mengurangi pengaruh perubahan tersebut. Katalis mempercepat tercapainya kesetimbangan tetapi tidak mengubah posisi kesetimbangan.”
+            </div>
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeModal('kesimpulanModal')" class="px-4 py-2 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition text-sm">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        const state = {
+            currentTab: 'konsentrasi',
+            concState: { n2: 4, h2: 12, nh3: 8, shift: 'none', message: 'Sistem dalam keadaan setimbang sempurna.' },
+            tempState: { level: 0, shift: 'none', message: 'Sistem berada pada suhu standar.' },
+            pressState: { level: 1, shift: 'none', message: 'Volume dan tekanan wadah normal.' },
+            catalystState: { active: false, message: 'Reaksi berlangsung tanpa katalis.' }
+        };
+
+        // DOM Elements
+        const visualWorkspace = document.getElementById('visual-workspace');
+        const controlsWorkspace = document.getElementById('controls-workspace');
+        const infoExplanation = document.getElementById('info-explanation');
+        const statusBadge = document.getElementById('status-badge');
+        const statusText = document.getElementById('status-text');
+        const reactionFormula = document.getElementById('reaction-formula');
+
+        let animationFrameId = null;
+
+        function switchTab(tabId) {
+            state.currentTab = tabId;
+            
+            document.querySelectorAll('.tab-button').forEach((btn, idx) => {
+                btn.classList.remove('active');
+                if((idx === 0 && tabId === 'konsentrasi') ||
+                   (idx === 1 && tabId === 'suhu') ||
+                   (idx === 2 && tabId === 'tekanan') ||
+                   (idx === 3 && tabId === 'katalis')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            resetStateForTab(tabId);
+            renderWorkspace();
+            startParticlePhysics();
+        }
+
+        function resetStateForTab(tabId) {
+            if(tabId === 'konsentrasi') {
+                state.concState = { n2: 4, h2: 12, nh3: 8, shift: 'none', message: 'Sistem dalam keadaan setimbang.' };
+            } else if(tabId === 'suhu') {
+                state.tempState = { level: 0, shift: 'none', message: 'Sistem berada pada suhu standar.' };
+            } else if(tabId === 'tekanan') {
+                state.pressState = { level: 1, shift: 'none', message: 'Volume dan tekanan wadah seimbang.' };
+            } else if(tabId === 'katalis') {
+                state.catalystState = { active: false, message: 'Reaksi berlangsung normal tanpa katalis.' };
+            }
+
+            reactionFormula.innerHTML = tabId === 'suhu' ? "N₂(g) + 3H₂(g) ⇌ 2NH₃(g) + panas" : "N₂(g) + 3H₂(g) ⇌ 2NH₃(g)";
+        }
+
+        function resetSimulation() {
+            resetStateForTab(state.currentTab);
+            renderWorkspace();
+            startParticlePhysics();
+        }
+
+        function renderWorkspace() {
+            if(state.currentTab === 'konsentrasi') renderConcentrationTab();
+            else if(state.currentTab === 'suhu') renderSuhuTab();
+            else if(state.currentTab === 'tekanan') renderTekananTab();
+            else if(state.currentTab === 'katalis') renderKatalisTab();
+        }
+
+        // --- TAB 1: KONSENTRASI ---
+        function renderConcentrationTab() {
+            const { n2, h2, nh3, shift, message } = state.concState;
+            
+            visualWorkspace.innerHTML = `
+                <div class="flex flex-col items-center">
+                    <span class="text-xs font-semibold text-slate-500 mb-1">Gelas Tertutup 1 (Reaktan N₂ & H₂)</span>
+                    <div class="beaker-container">
+                        <div class="beaker-lid"></div>
+                        <div class="beaker-neck"></div>
+                        <div class="beaker">
+                            <div class="particles-area" id="box-reactants">
+                                ${generateIUPACParticlesHTML(n2, 'N2')}
+                                ${generateIUPACParticlesHTML(h2, 'H2')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center justify-center my-2 md:my-0">
+                    <div class="text-3xl font-bold ${shift === 'right' ? 'text-emerald-600 animate-arrow-right' : shift === 'left' ? 'text-amber-600 animate-arrow-left' : 'text-slate-400'}">
+                        ${shift === 'right' ? '→' : shift === 'left' ? '←' : '⇌'}
+                    </div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 mt-1">
+                        ${shift === 'right' ? 'Geser Kanan' : shift === 'left' ? 'Geser Kiri' : 'Setimbang'}
+                    </span>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-xs font-semibold text-slate-500 mb-1">Gelas Tertutup 2 (Produk NH₃)</span>
+                    <div class="beaker-container">
+                        <div class="beaker-lid"></div>
+                        <div class="beaker-neck"></div>
+                        <div class="beaker">
+                            <div class="particles-area" id="box-products">
+                                ${generateIUPACParticlesHTML(nh3, 'NH3')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            controlsWorkspace.innerHTML = `
+                <div class="text-center text-xs font-semibold text-slate-500 mb-3 uppercase tracking-wider">Ubah Konsentrasi Zat</div>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="modifyConcentration('n2')" class="custom-btn px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-xl border border-blue-200 text-xs shadow-2xs flex flex-col items-center">
+                        <span>+ Tambah N₂</span>
+                        <span class="text-[10px] text-blue-500 font-normal mt-0.5">Reaktan (Biru)</span>
+                    </button>
+                    <button onclick="modifyConcentration('h2')" class="custom-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl border border-slate-300 text-xs shadow-2xs flex flex-col items-center">
+                        <span>+ Tambah H₂</span>
+                        <span class="text-[10px] text-slate-500 font-normal mt-0.5">Reaktan (Putih)</span>
+                    </button>
+                    <button onclick="modifyConcentration('nh3')" class="custom-btn px-3 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold rounded-xl border border-purple-200 text-xs shadow-2xs flex flex-col items-center">
+                        <span>+ Tambah NH₃</span>
+                        <span class="text-[10px] text-purple-500 font-normal mt-0.5">Produk</span>
+                    </button>
+                </div>
+            `;
+
+            statusText.innerText = message;
+            infoExplanation.innerHTML = `Jika konsentrasi suatu zat ditambah, sistem akan bergeser ke arah yang berlawanan untuk mengurangi kelebihan zat tersebut. Menambah reaktan menggeser kesetimbangan ke kanan (→).`;
+        }
+
+        function modifyConcentration(type) {
+            if (type === 'n2') {
+                state.concState.n2 += 3;
+                state.concState.nh3 += 3;
+                state.concState.shift = 'right';
+                state.concState.message = 'Penambahan N₂ (biru) mengganggu sistem. Reaksi bergeser ke kanan (→) membentuk lebih banyak NH₃.';
+            } else if (type === 'h2') {
+                state.concState.h2 += 4;
+                state.concState.nh3 += 3;
+                state.concState.shift = 'right';
+                state.concState.message = 'Penambahan H₂ (putih) mengganggu sistem. Reaksi bergeser ke kanan (→) mengurangi H₂ berlebih.';
+            } else if (type === 'nh3') {
+                state.concState.nh3 += 4;
+                state.concState.n2 += 2;
+                state.concState.shift = 'left';
+                state.concState.message = 'Penambahan NH₃ (produk) menyebabkan sistem bergeser ke kiri (←) membentuk kembali N₂ dan H₂.';
+            }
+            renderConcentrationTab();
+            startParticlePhysics();
+        }
+
+        // --- TAB 2: SUHU ---
+        function renderSuhuTab() {
+            const { level, shift, message } = state.tempState;
+            let beakerBg = "bg-slate-50";
+            let tempDesc = "Suhu Standar";
+            let n2Count = 4, h2Count = 12, nh3Count = 8;
+
+            if (level > 0) {
+                beakerBg = "bg-rose-50/50";
+                tempDesc = "Suhu Tinggi (Panas ↑)";
+                nh3Count = 4; // shifts left
+            } else if (level < 0) {
+                beakerBg = "bg-blue-50/50";
+                tempDesc = "Suhu Rendah (Dingin)";
+                nh3Count = 12; // shifts right
+            }
+
+            visualWorkspace.innerHTML = `
+                <div class="flex flex-col items-center">
+                    <span class="text-xs font-semibold text-slate-500 mb-1">Gelas Kimia Tertutup (Eksoterm)</span>
+                    <div class="beaker-container">
+                        <div class="beaker-lid"></div>
+                        <div class="beaker-neck"></div>
+                        <div class="beaker ${beakerBg}">
+                            <div class="particles-area">
+                                ${generateIUPACParticlesHTML(n2Count, 'N2')}
+                                ${generateIUPACParticlesHTML(h2Count, 'H2')}
+                                ${generateIUPACParticlesHTML(nh3Count, 'NH3')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center justify-center my-2 md:my-0">
+                    <div class="text-3xl font-bold ${shift === 'right' ? 'text-emerald-600 animate-arrow-right' : shift === 'left' ? 'text-amber-600 animate-arrow-left' : 'text-slate-400'}">
+                        ${shift === 'right' ? '→' : shift === 'left' ? '←' : '⇌'}
+                    </div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 mt-1">${tempDesc}</span>
+                </div>
+
+                <div class="flex flex-col items-center justify-center bg-white p-4 rounded-xl border border-slate-200 shadow-2xs w-48 text-center">
+                    <span class="text-xs text-slate-500 font-medium">Kondisi Termal</span>
+                    <span class="text-sm font-bold text-slate-800 mt-1">${level > 0 ? 'Pemanasan Sistem' : level < 0 ? 'Pendinginan Sistem' : 'Setimbang Normal'}</span>
+                    <span class="text-[11px] text-slate-400 mt-1">Reaksi maju bersifat Eksoterm (+ panas)</span>
+                </div>
+            `;
+
+            controlsWorkspace.innerHTML = `
+                <div class="text-center text-xs font-semibold text-slate-500 mb-3 uppercase tracking-wider">Atur Suhu Sistem</div>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="modifyTemperature(1)" class="custom-btn px-4 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold rounded-xl border border-rose-200 text-sm flex items-center justify-center space-x-2">
+                        <span>🔥 Suhu Naik</span>
+                    </button>
+                    <button onclick="modifyTemperature(-1)" class="custom-btn px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-xl border border-blue-200 text-sm flex items-center justify-center space-x-2">
+                        <span>❄️ Suhu Turun</span>
+                    </button>
+                </div>
+            `;
+
+            statusText.innerText = message;
+            infoExplanation.innerHTML = `Reaksi pembentukan amonia adalah <strong>eksoterm</strong> (melepaskan panas di produk). Ketika suhu dinaikkan, kesetimbangan bergeser ke arah endoterm (kiri).`;
+        }
+
+        function modifyTemperature(val) {
+            state.tempState.level = val;
+            if (val > 0) {
+                state.tempState.shift = 'left';
+                state.tempState.message = 'Suhu dinaikkan! Sistem bergeser ke kiri (←) ke arah endoterm untuk menyerap kelebihan panas.';
+            } else {
+                state.tempState.shift = 'right';
+                state.tempState.message = 'Suhu diturunkan! Sistem bergeser ke kanan (→) ke arah eksoterm untuk memproduksi panas.';
+            }
+            renderSuhuTab();
+            startParticlePhysics();
+        }
+
+        // --- TAB 3: TEKANAN / VOLUME ---
+        function renderTekananTab() {
+            const { level, shift, message } = state.pressState;
+            let beakerHeight = "165px";
+            let lidTop = "20px";
+            let scaleDesc = "Volume Normal";
+
+            if (level === 2) {
+                beakerHeight = "130px";
+                lidTop = "55px";
+                scaleDesc = "Volume Diperkecil (Tekanan Tinggi ⬆)";
+            } else if (level === 0) {
+                beakerHeight = "190px";
+                lidTop = "5px";
+                scaleDesc = "Volume Diperbesar (Tekanan Rendah ⬇)";
+            }
+
+            visualWorkspace.innerHTML = `
+                <div class="flex flex-col items-center">
+                    <span class="text-xs font-semibold text-slate-500 mb-1">Gelas Tertutup (Piston)</span>
+                    <div class="beaker-container" style="height: 210px;">
+                        <div class="beaker-lid" style="top: ${lidTop}; transition: top 0.4s ease;"></div>
+                        <div class="beaker-neck"></div>
+                        <div class="beaker" style="height: ${beakerHeight}; transition: height 0.4s ease;">
+                            <div class="particles-area">
+                                ${generateIUPACParticlesHTML(4, 'N2')}
+                                ${generateIUPACParticlesHTML(12, 'H2')}
+                                ${generateIUPACParticlesHTML(level === 2 ? 12 : level === 0 ? 4 : 8, 'NH3')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center justify-center my-2 md:my-0">
+                    <div class="text-3xl font-bold ${shift === 'right' ? 'text-emerald-600 animate-arrow-right' : shift === 'left' ? 'text-amber-600 animate-arrow-left' : 'text-slate-400'}">
+                        ${shift === 'right' ? '→' : shift === 'left' ? '←' : '⇌'}
+                    </div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 mt-1 text-center">${scaleDesc}</span>
+                </div>
+
+                <div class="flex flex-col items-center justify-center bg-white p-4 rounded-xl border border-slate-200 shadow-2xs w-48 text-center">
+                    <span class="text-xs text-slate-500 font-medium">Jumlah Mol Gas</span>
+                    <span class="text-xs font-bold text-slate-700 mt-1">Reaktan (4 mol) ⇌ Produk (2 mol)</span>
+                    <span class="text-[11px] text-emerald-600 mt-1 font-medium">Sisi Kanan Lebih Sedikit Mol</span>
+                </div>
+            `;
+
+            controlsWorkspace.innerHTML = `
+                <div class="text-center text-xs font-semibold text-slate-500 mb-3 uppercase tracking-wider">Atur Tekanan / Volume Wadah</div>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="modifyPressure(2)" class="custom-btn px-3 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold rounded-xl border border-slate-300 text-xs flex flex-col items-center">
+                        <span>Tekanan ↑ / Volume ↓</span>
+                        <span class="text-[10px] text-slate-500 font-normal mt-0.5">Partikel Lebih Rapat</span>
+                    </button>
+                    <button onclick="modifyPressure(0)" class="custom-btn px-3 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold rounded-xl border border-slate-300 text-xs flex flex-col items-center">
+                        <span>Tekanan ↓ / Volume ↑</span>
+                        <span class="text-[10px] text-slate-500 font-normal mt-0.5">Partikel Lebih Renggang</span>
+                    </button>
+                </div>
+            `;
+
+            statusText.innerText = message;
+            infoExplanation.innerHTML = `Jika tekanan dinaikkan (volume diperkecil), sistem bergeser ke arah jumlah mol gas yang lebih kecil (ke kanan / 2 mol).`;
+        }
+
+        function modifyPressure(lvl) {
+            state.pressState.level = lvl;
+            if (lvl === 2) {
+                state.pressState.shift = 'right';
+                state.pressState.message = 'Tekanan dinaikkan! Sistem bergeser ke kanan (→) menuju jumlah mol gas lebih kecil.';
+            } else {
+                state.pressState.shift = 'left';
+                state.pressState.message = 'Tekanan diturunkan! Sistem bergeser ke kiri (←) menuju jumlah mol gas lebih besar.';
+            }
+            renderTekananTab();
+            startParticlePhysics();
+        }
+
+        // --- TAB 4: KATALIS ---
+        function renderKatalisTab() {
+            const { active, message } = state.catalystState;
+
+            visualWorkspace.innerHTML = `
+                <div class="flex flex-col items-center">
+                    <span class="text-xs font-semibold text-slate-500 mb-1">Tanpa Katalis</span>
+                    <div class="beaker-container w-32 h-44">
+                        <div class="beaker-lid"></div>
+                        <div class="beaker-neck"></div>
+                        <div class="beaker" style="height: 120px;">
+                            <div class="particles-area">
+                                ${generateIUPACParticlesHTML(3, 'N2')}
+                                ${generateIUPACParticlesHTML(6, 'H2')}
+                                ${generateIUPACParticlesHTML(4, 'NH3')}
+                            </div>
+                        </div>
+                    </div>
+                    <span class="text-[11px] text-slate-500 mt-2 font-medium">Reaksi Normal</span>
+                </div>
+
+                <div class="flex flex-col items-center justify-center my-2 md:my-0">
+                    <div class="text-2xl font-bold text-amber-500 animate-arrow-right">→</div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mt-1">${active ? 'Katalis Aktif' : 'Efek Katalis'}</span>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-xs font-semibold text-emerald-700 mb-1">Dengan Katalis (Pt/Fe)</span>
+                    <div class="beaker-container w-32 h-44">
+                        <div class="beaker-lid" style="background-color: #10b981;"></div>
+                        <div class="beaker-neck" style="background-color: #059669;"></div>
+                        <div class="beaker border-emerald-300 bg-emerald-50/20" style="height: 120px;">
+                            <div class="particles-area">
+                                ${generateIUPACParticlesHTML(3, 'N2')}
+                                ${generateIUPACParticlesHTML(6, 'H2')}
+                                ${generateIUPACParticlesHTML(4, 'NH3')}
+                            </div>
+                        </div>
+                    </div>
+                    <span class="text-[11px] text-emerald-600 font-semibold mt-2">${active ? '⚡ Setimbang Cepat!' : 'Setimbang Cepat'}</span>
+                </div>
+            `;
+
+            controlsWorkspace.innerHTML = `
+                <div class="text-center text-xs font-semibold text-slate-500 mb-3 uppercase tracking-wider">Kontrol Katalis Reaksi</div>
+                <div class="flex justify-center gap-3">
+                    <button onclick="toggleCatalyst()" class="custom-btn px-6 py-3 ${active ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-white text-slate-700 hover:bg-slate-50'} font-semibold rounded-xl border border-slate-300 text-sm shadow-2xs flex items-center space-x-2">
+                        <span>${active ? '✨ Katalis Aktif (Digunakan)' : '➕ Tambahkan Katalis (Pt/Fe)'}</span>
+                    </button>
+                </div>
+            `;
+
+            statusText.innerText = message;
+            infoExplanation.innerHTML = `Katalis menurunkan energi aktivasi sehingga kesetimbangan tercapai jauh lebih cepat, namun <strong>posisi kesetimbangan tetap sama</strong> (tidak bergeser).`;
+        }
+
+        function toggleCatalyst() {
+            state.catalystState.active = !state.catalystState.active;
+            if(state.catalystState.active) {
+                state.catalystState.message = 'Katalis ditambahkan! Laju reaksi maju & balik meningkat, setimbang tercapai lebih cepat tanpa geseran (↔).';
+            } else {
+                state.catalystState.message = 'Katalis dilepas. Kecepatan reaksi normal.';
+            }
+            renderKatalisTab();
+            startParticlePhysics();
+        }
+
+        // --- IUPAC Particle HTML Generator & Motion Physics ---
+        function generateIUPACParticlesHTML(count, type) {
+            let html = '';
+            for(let i = 0; i < count; i++) {
+                const left = Math.floor(Math.random() * 75) + 10;
+                const bottom = Math.floor(Math.random() * 70) + 10;
+                
+                if (type === 'N2') {
+                    // Diatomic Nitrogen: 2 blue atoms bonded side-by-side
+                    html += `<div class="molecule-type particle-item" style="left: ${left}%; bottom: ${bottom}%; position: absolute;">
+                        <div class="flex space-x-0.5">
+                            <div class="atom atom-n" title="N">N</div>
+                            <div class="atom atom-n" title="N">N</div>
+                        </div>
+                    </div>`;
+                } else if (type === 'H2') {
+                    // Diatomic Hydrogen: 2 white/cyan atoms bonded side-by-side
+                    html += `<div class="molecule-type particle-item" style="left: ${left}%; bottom: ${bottom}%; position: absolute;">
+                        <div class="flex space-x-0.5">
+                            <div class="atom atom-h" title="H">H</div>
+                            <div class="atom atom-h" title="H">H</div>
+                        </div>
+                    </div>`;
+                } else if (type === 'NH3') {
+                    // Ammonia: 1 central blue N attached to 3 white H atoms
+                    html += `<div class="molecule-type particle-item" style="left: ${left}%; bottom: ${bottom}%; position: absolute;">
+                        <div class="relative flex items-center justify-center" style="width: 28px; height: 24px;">
+                            <div class="atom atom-n absolute" style="left: 4px; top: 2px;" title="N">N</div>
+                            <div class="atom atom-h absolute" style="left: 0px; bottom: 0px;" title="H">H</div>
+                            <div class="atom atom-h absolute" style="right: 0px; bottom: 0px;" title="H">H</div>
+                            <div class="atom atom-h absolute" style="top: 0px; right: 4px;" title="H">H</div>
+                        </div>
+                    </div>`;
+                }
+            }
+            return html;
+        }
+
+        // Continuous Gentle Movement Animation for Balls Inside Beaker
+        function startParticlePhysics() {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            const particles = document.querySelectorAll('.particle-item');
+            const velocities = Array.from(particles).map(() => ({
+                dx: (Math.random() - 0.5) * 0.4,
+                dy: (Math.random() - 0.5) * 0.4
+            }));
+
+            let positions = Array.from(particles).map(p => ({
+                x: parseFloat(p.style.left) || 20,
+                y: parseFloat(p.style.bottom) || 20
+            }));
+
+            function animateParticles() {
+                particles.forEach((p, idx) => {
+                    positions[idx].x += velocities[idx].dx;
+                    positions[idx].y += velocities[idx].dy;
+
+                    // Bounce within bounds (5% to 80%)
+                    if (positions[idx].x < 5 || positions[idx].x > 80) velocities[idx].dx *= -1;
+                    if (positions[idx].y < 5 || positions[idx].y > 75) velocities[idx].dy *= -1;
+
+                    p.style.left = positions[idx].x + '%';
+                    p.style.bottom = positions[idx].y + '%';
+                });
+                animationFrameId = requestAnimationFrame(animateParticles);
+            }
+            animateParticles();
+        }
+
+        // Modal Controls
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        // Initial Load
+        window.onload = function() {
+            switchTab('konsentrasi');
+        };
+    </script>
+</body>
+</html>

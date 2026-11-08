@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kesetimbangan Kimia: Kc, Kp, dan Qc</title>
+<style>
+:root{--bg:#eef5fd;--card:#fff;--tx:#0f1f3a;--mu:#4a5b78;--dk:#0b2a5b;--ac:#1d4ed8;--lt:#dbeafe;--bd:#bfd6f5;--ok:#15803d;--no:#b91c1c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#081226;--card:#0f1d3a;--tx:#e6efff;--mu:#9db4d8;--dk:#1e3a8a;--ac:#60a5fa;--lt:#14284f;--bd:#254277;--ok:#4ade80;--no:#f87171}}
+*{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:var(--dk);color:#fff;padding:20px 16px}
+header div,.w{max-width:760px;margin:0 auto}
+header h1{font-size:1.5rem;margin:0 0 4px}header p{margin:0;color:#bcd4ff}
+.w{padding:16px}
+h2{font-size:1.15rem;margin:0 0 8px;color:var(--dk)}
+@media(prefers-color-scheme:dark){h2{color:#93c5fd}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px}
+.tp{background:var(--dk);color:#fff;padding:8px 12px;border-radius:8px;font-size:.9rem;margin:20px 0 10px}
+.tp b{color:#93c5fd}
+.f{background:var(--lt);border-radius:8px;padding:8px 12px;margin:8px 0;font-family:Georgia,serif;overflow-x:auto;white-space:nowrap}
+.sub{color:var(--mu);font-size:.9rem}
+label{display:block;font-size:.9rem;margin:6px 0}
+input[type=number]{width:100px;padding:6px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:8px}
+.res{margin-top:10px;padding:10px;border-radius:8px;background:var(--lt);border-left:4px solid var(--ac);font-weight:600}
+.q{margin-top:12px;padding-top:12px;border-top:1px dashed var(--bd)}
+.q label{cursor:pointer;padding:6px 8px;border:1px solid var(--bd);border-radius:8px;margin:4px 0}
+.fb{font-size:.9rem;margin-top:6px}.ok{color:var(--ok)}.no{color:var(--no)}
+.bar{position:relative;height:24px;background:var(--lt);border:1px solid var(--bd);border-radius:12px;margin:10px 0}
+.bar i{position:absolute;top:-1px;height:24px;width:6px;border-radius:3px}
+button.a{background:var(--ac);color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font:inherit}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th{background:var(--lt)}td,th{border:1px solid var(--bd);padding:6px;text-align:left}
+.num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--dk);color:#fff;font-size:.85rem;margin-right:8px;vertical-align:middle}
+.fm{background:var(--lt);border:1px dashed var(--ac);border-radius:10px;padding:12px;margin:10px 0;text-align:center;font-weight:700;overflow-x:auto;white-space:nowrap}
+.note{background:#ecf7ee;border:1px solid #b7e0bf;color:#166534;border-radius:8px;padding:10px 12px;margin:10px 0;font-size:.92rem}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .note{background:#0f2a1b;border-color:#1f5a35;color:#86efac}}
+.dt th{background:var(--dk);color:#fff}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="card" style="margin-top:16px"><h2><span class="num">1</span>A. Definisi</h2>
+<p>Tetapan kesetimbangan (K) adalah perbandingan hasil kali konsentrasi (atau tekanan) produk yang dipangkatkan koefisiennya terhadap hasil kali konsentrasi (atau tekanan) reaktan yang dipangkatkan koefisiennya, pada saat setimbang dan suhu tertentu.</p>
+<div class="fm">aA(g) + bB(g) ⇌ cC(g) + dD(g)</div>
+<p><b>Ciri-ciri reaksi kesetimbangan:</b></p>
+<ul><li><b>Reversibel:</b> reaksi dapat berlangsung ke dua arah (⇌).</li>
+<li><b>Dinamis:</b> reaksi tetap berlangsung, laju reaksi maju = laju reaksi balik.</li>
+<li><b>Sistem tertutup:</b> tidak ada zat yang keluar atau masuk.</li>
+<li><b>Makroskopis tetap:</b> konsentrasi, tekanan, dan warna campuran tidak berubah.</li>
+<li><b>Hanya dipengaruhi suhu:</b> nilai K berubah hanya jika suhu berubah.</li></ul></div>
+
+<div class="card"><h2><span class="num">2</span>B. Tetapan Kesetimbangan Konsentrasi (Kc)</h2>
+<div class="fm">aA(aq) + bB(aq) ⇌ cC(aq) + dD(aq)</div>
+<div class="fm">Kc = [C]<sup>c</sup>[D]<sup>d</sup> / [A]<sup>a</sup>[B]<sup>b</sup></div>
+<p class="sub">Keterangan: [A], [B], [C], [D] = konsentrasi zat saat setimbang (mol/L); a, b, c, d = koefisien reaksi.</p>
+<div class="tw"><table class="dt"><tr><th>Nilai Kc</th><th>Kondisi kesetimbangan</th></tr>
+<tr><td>Kc ≫ 1 (besar)</td><td>Produk lebih banyak daripada reaktan</td></tr>
+<tr><td>Kc ≈ 1</td><td>Jumlah reaktan dan produk hampir sama</td></tr>
+<tr><td>Kc ≪ 1 (kecil)</td><td>Reaktan lebih banyak daripada produk</td></tr></table></div>
+<p><b>Aturan penulisan Kc:</b> hanya zat berfase gas (g) dan larutan (aq) yang ditulis. Zat padat (s) dan cairan murni (l) <u>tidak</u> ditulis karena konsentrasinya dianggap tetap.</p>
+<div class="tw"><table class="dt"><tr><th>Reaksi</th><th>Rumus Kc</th><th>Jenis</th></tr>
+<tr><td>N₂(g) + 3H₂(g) ⇌ 2NH₃(g)</td><td>[NH₃]² / [N₂][H₂]³</td><td>Homogen (gas)</td></tr>
+<tr><td>Fe³⁺(aq) + SCN⁻(aq) ⇌ FeSCN²⁺(aq)</td><td>[FeSCN²⁺] / [Fe³⁺][SCN⁻]</td><td>Homogen (larutan)</td></tr>
+<tr><td>C(s) + CO₂(g) ⇌ 2CO(g)</td><td>[CO]² / [CO₂]</td><td>Heterogen</td></tr></table></div></div>
+
+<div class="card"><h2><span class="num">3</span>C. Tetapan Kesetimbangan Tekanan (Kp)</h2>
+<div class="fm">aA(g) + bB(g) ⇌ cC(g) + dD(g)</div>
+<div class="fm">Kp = (P<sub>C</sub>)<sup>c</sup>(P<sub>D</sub>)<sup>d</sup> / (P<sub>A</sub>)<sup>a</sup>(P<sub>B</sub>)<sup>b</sup></div>
+<p class="sub">Keterangan: P = tekanan parsial gas saat setimbang (atm). Hanya zat berfase <b>gas</b> yang ditulis.</p>
+<div class="tw"><table class="dt"><tr><th>Nilai Kp</th><th>Kondisi kesetimbangan</th></tr>
+<tr><td>Kp ≫ 1</td><td>Produk gas lebih dominan</td></tr>
+<tr><td>Kp ≈ 1</td><td>Reaktan dan produk gas hampir sama</td></tr>
+<tr><td>Kp ≪ 1</td><td>Reaktan gas lebih dominan</td></tr></table></div>
+<p><b>Tekanan parsial</b> dihitung dari fraksi mol dan tekanan total:</p>
+<div class="fm">P<sub>A</sub> = (mol A / mol total) × P<sub>total</sub></div>
+<p class="sub">Contoh heterogen: C(s) + CO₂(g) ⇌ 2CO(g) → Kp = (P<sub>CO</sub>)² / P<sub>CO₂</sub> (karbon padat tidak ditulis).</p></div>
+
+<div class="card"><h2><span class="num">4</span>D. Hubungan Kc dan Kp</h2>
+<div class="fm">Kp = Kc (RT)<sup>Δn</sup></div>
+<p class="sub">R = 0,082 L·atm·mol⁻¹·K⁻¹; T = suhu mutlak (K) = °C + 273; Δn = jumlah mol gas produk − jumlah mol gas reaktan (hanya koefisien gas).</p>
+<div class="note"><b>Catatan:</b> Jika Δn = 0 → Kp = Kc | Δn &gt; 0 → Kp &gt; Kc | Δn &lt; 0 → Kp &lt; Kc</div>
+<div class="tw"><table class="dt"><tr><th>Reaksi</th><th>Δn</th><th>Hubungan</th></tr>
+<tr><td>H₂(g) + I₂(g) ⇌ 2HI(g)</td><td>2 − 2 = 0</td><td>Kp = Kc</td></tr>
+<tr><td>PCl₅(g) ⇌ PCl₃(g) + Cl₂(g)</td><td>2 − 1 = +1</td><td>Kp = Kc(RT)</td></tr>
+<tr><td>N₂(g) + 3H₂(g) ⇌ 2NH₃(g)</td><td>2 − 4 = −2</td><td>Kp = Kc(RT)⁻²</td></tr></table></div>
+<p><b>Contoh:</b> N₂ + 3H₂ ⇌ 2NH₃ memiliki Kc = 40 pada 500 K. Hitung Kp.</p>
+<ol><li>Δn = 2 − 4 = −2</li><li>RT = 0,082 × 500 = 41</li><li>Kp = 40 × 41⁻² = 40 / 1681 ≈ <b>2,38 × 10⁻²</b></li></ol></div>
+
+<div class="card"><h2><span class="num">5</span>E. Kuosien Reaksi (Qc)</h2>
+<div class="fm">Qc = [C]<sup>c</sup>[D]<sup>d</sup> / [A]<sup>a</sup>[B]<sup>b</sup> (konsentrasi saat ini)</div>
+<div class="tw"><table class="dt"><tr><th>Pembeda</th><th>Kc</th><th>Qc</th></tr>
+<tr><td>Rumus</td><td colspan="2">Sama (produk berpangkat koefisien : reaktan berpangkat koefisien)</td></tr>
+<tr><td>Data konsentrasi</td><td>Hanya saat setimbang</td><td>Sembarang waktu</td></tr>
+<tr><td>Nilai</td><td>Tetap pada suhu tertentu</td><td>Berubah seiring reaksi</td></tr>
+<tr><td>Fungsi</td><td>Ukuran posisi setimbang</td><td>Penentu arah reaksi (TP 3)</td></tr></table></div></div>
+
+<div class="card"><h2><span class="num">6</span>F. Sifat Tetapan Kesetimbangan</h2>
+<div class="tw"><table class="dt"><tr><th>Perubahan persamaan reaksi</th><th>Pengaruh pada K</th><th>Contoh (K awal = 40)</th></tr>
+<tr><td>Reaksi dibalik</td><td>K′ = 1/K</td><td>2NH₃ ⇌ N₂ + 3H₂ → 0,025</td></tr>
+<tr><td>Koefisien dikali n</td><td>K′ = Kⁿ</td><td>Dikali ½ → √40 ≈ 6,32</td></tr>
+<tr><td>Dua reaksi dijumlahkan</td><td>K = K₁ × K₂</td><td>K₁ = 2 dan K₂ = 5 → K = 10</td></tr></table></div></div>
+
+<div class="card"><h2>Cek pemahaman TP 1</h2>
+<div class="q" style="border:0;margin:0;padding:0" data-a="1" data-e="Qc memakai rumus yang sama dengan Kc, tetapi konsentrasinya diambil pada sembarang waktu.">
+<b>1.</b> Apa perbedaan Qc dan Kc?
+<label><input type="radio" name="t1"> Qc hanya untuk zat padat</label>
+<label><input type="radio" name="t1"> Rumus sama; Qc memakai konsentrasi sembarang waktu, Kc saat setimbang</label>
+<label><input type="radio" name="t1"> Qc selalu sama dengan Kc</label><div class="fb"></div></div>
+<div class="q" data-a="2" data-e="Padatan tidak ditulis, sehingga Kc = [CO₂].">
+<b>2.</b> Untuk CaCO₃(s) ⇌ CaO(s) + CO₂(g), rumus Kc adalah…
+<label><input type="radio" name="t1b"> [CaO][CO₂]/[CaCO₃]</label>
+<label><input type="radio" name="t1b"> [CO₂]/[CaCO₃]</label>
+<label><input type="radio" name="t1b"> [CO₂]</label><div class="fb"></div></div>
+<div class="q" data-a="0" data-e="Δn = 2 − 3 = −1 (negatif), sehingga Kp = Kc(RT)⁻¹ dan Kp < Kc.">
+<b>3.</b> Pada 2SO₂(g) + O₂(g) ⇌ 2SO₃(g), hubungan Kp dan Kc adalah…
+<label><input type="radio" name="t1c"> Kp &lt; Kc</label>
+<label><input type="radio" name="t1c"> Kp = Kc</label>
+<label><input type="radio" name="t1c"> Kp &gt; Kc</label><div class="fb"></div></div>
+<div class="q" data-a="1" data-e="Reaksi dibalik, maka K′ = 1/K = 1/40 = 0,025.">
+<b>4.</b> N₂ + 3H₂ ⇌ 2NH₃ memiliki K = 40. Nilai K untuk 2NH₃ ⇌ N₂ + 3H₂ adalah…
+<label><input type="radio" name="t1d"> 40</label>
+<label><input type="radio" name="t1d"> 0,025</label>
+<label><input type="radio" name="t1d"> 1.600</label><div class="fb"></div></div></div>
+
+<div class="tp"><b>TP 2</b> · Menghitung Kc, Kp, dan Qc</div>
+<div class="card"><h2>Contoh berlangkah</h2>
+<div class="f">N₂(g) + 3H₂(g) ⇌ 2NH₃(g)</div>
+<p>Data setimbang: [N₂] = 0,5 M; [H₂] = 0,2 M; [NH₃] = 0,4 M.</p>
+<ol><li>Rumus: Kc = [NH₃]² / ([N₂][H₂]³)</li>
+<li>Substitusi: Kc = (0,4)² / (0,5 × 0,2³)</li>
+<li>Hitung: 0,16 / 0,004 = <b>40</b></li></ol>
+<h2 style="margin-top:14px">Kalkulator</h2>
+<div class="g"><label>[N₂] M<br><input type="number" id="a1" value="0.5" step="0.1" min="0.01"></label>
+<label>[H₂] M<br><input type="number" id="a2" value="0.2" step="0.1" min="0.01"></label>
+<label>[NH₃] M<br><input type="number" id="a3" value="0.4" step="0.1" min="0"></label></div>
+<button class="a" onclick="calc()">Hitung</button><div class="res" id="r1">Tekan Hitung.</div></div>
+
+<div class="tp"><b>TP 3</b> · Analisis hubungan Qc dan Kc</div>
+<div class="card"><h2>Hubungan Kc dan Qc</h2>
+<p><b>Kc</b> adalah nilai "target" kesetimbangan: tetap selama suhu tidak berubah. <b>Qc</b> adalah "potret" campuran reaksi pada saat tertentu, nilainya berubah seiring reaksi berlangsung.</p>
+<div class="f">Reaksi berlangsung → Qc bergerak mendekati Kc → saat setimbang Qc = Kc</div>
+<p class="sub">Contoh N₂ + 3H₂ ⇌ 2NH₃ dengan Kc = 40 (suhu tetap):</p>
+<div class="tw"><table><tr><th>[N₂]</th><th>[H₂]</th><th>[NH₃]</th><th>Qc</th><th>Perbandingan</th><th>Arah</th></tr>
+<tr><td>0,5</td><td>0,5</td><td>1,0</td><td>16</td><td>Qc &lt; Kc</td><td>Ke kanan, Qc naik ke 40</td></tr>
+<tr><td>0,5</td><td>0,2</td><td>0,4</td><td>40</td><td>Qc = Kc</td><td>Setimbang</td></tr>
+<tr><td>0,2</td><td>0,2</td><td>0,4</td><td>100</td><td>Qc &gt; Kc</td><td>Ke kiri, Qc turun ke 40</td></tr></table></div>
+<p class="sub">Kesimpulan: Qc selalu "mengejar" Kc. Jika Qc lebih kecil, produk bertambah sehingga Qc naik. Jika Qc lebih besar, reaktan bertambah sehingga Qc turun.</p>
+<div class="q" data-a="2" data-e="Reaksi bergeser ke kiri, produk berkurang, sehingga Qc turun sampai sama dengan Kc. Kc sendiri tidak berubah karena suhu tetap.">
+<b>Cek:</b> Pada suhu tetap, campuran memiliki Qc = 100 dan Kc = 40. Apa yang terjadi?
+<label><input type="radio" name="h1"> Kc naik menjadi 100</label>
+<label><input type="radio" name="h1"> Qc naik sampai 100 lalu berhenti</label>
+<label><input type="radio" name="h1"> Reaksi ke kiri, Qc turun sampai sama dengan Kc (40)</label><div class="fb"></div></div></div>
+<div class="card"><h2>Bandingkan Qc dengan Kc</h2>
+<div class="tw"><table><tr><th>Kondisi</th><th>Arti</th><th>Arah reaksi</th></tr>
+<tr><td>Qc &lt; Kc</td><td>Produk terlalu sedikit</td><td>Ke kanan</td></tr>
+<tr><td>Qc = Kc</td><td>Setimbang</td><td>Tidak berubah</td></tr>
+<tr><td>Qc &gt; Kc</td><td>Produk terlalu banyak</td><td>Ke kiri</td></tr></table></div>
+<p class="sub">Simulasi: ubah nilai Qc dan Kc.</p>
+<label>Kc <input type="number" id="kk" value="40" min="0.001" step="any" oninput="cmp()"></label>
+<label>Qc <input type="number" id="qq" value="16" min="0" step="any" oninput="cmp()"></label>
+<div class="bar"><i id="mk" style="background:var(--no)"></i><i id="mkc" style="background:var(--ok)"></i></div>
+<div class="res" id="r2"></div>
+<div class="q" data-a="0" data-e="Qc (16) < Kc (40), produk masih kurang, sehingga reaksi bergeser ke kanan.">
+<b>Cek:</b> Jika Qc = 16 dan Kc = 40, arah reaksi…
+<label><input type="radio" name="t3"> Ke kanan, membentuk lebih banyak NH₃</label>
+<label><input type="radio" name="t3"> Ke kiri</label>
+<label><input type="radio" name="t3"> Sudah setimbang</label><div class="fb"></div></div></div>
+
+<div class="tp"><b>TP 4</b> · Latihan terpadu: Kc, Kp, dan Qc</div>
+<div class="card"><div class="f">2SO₂(g) + O₂(g) ⇌ 2SO₃(g)</div>
+<div class="q" style="border:0;margin:0;padding:0" data-a="1" data-e="Kp = (0,4)² / ((0,2)²(0,1)) = 0,16 / 0,004 = 40.">
+<b>Soal 1.</b> Tekanan parsial setimbang: P(SO₂)=0,2 atm; P(O₂)=0,1 atm; P(SO₃)=0,4 atm. Nilai Kp?
+<label><input type="radio" name="p1"> 8</label><label><input type="radio" name="p1"> 40</label><label><input type="radio" name="p1"> 80</label><div class="fb"></div></div>
+<div class="q" data-a="2" data-e="Qc = (0,4)² / ((0,5)²(0,2)) = 0,16 / 0,05 = 3,2.">
+<b>Soal 2.</b> Pada suatu saat: [SO₂]=0,5 M; [O₂]=0,2 M; [SO₃]=0,4 M. Nilai Qc?
+<label><input type="radio" name="p2"> 0,8</label><label><input type="radio" name="p2"> 1,6</label><label><input type="radio" name="p2"> 3,2</label><div class="fb"></div></div>
+<div class="q" data-a="0" data-e="Qc (3,2) > Kc (2,5): produk berlebih, reaksi bergeser ke kiri.">
+<b>Soal 3.</b> Jika Kc = 2,5, arah reaksi pada Soal 2?
+<label><input type="radio" name="p3"> Ke kiri</label><label><input type="radio" name="p3"> Ke kanan</label><label><input type="radio" name="p3"> Setimbang</label><div class="fb"></div></div>
+<p class="sub">Rangkuman: tulis rumus → substitusi data → hitung → bandingkan Qc dengan Kc.</p></div>
+</div>
+<script>
+function fmt(x){return (+x.toPrecision(4)).toString().replace(".",",")}
+function calc(){const n=+a1.value,h=+a2.value,a=+a3.value;if(!(n>0&&h>0)){r1.textContent="[N₂] dan [H₂] harus lebih dari 0.";return}
+const v=a*a/(n*h*h*h);r1.innerHTML="Kc (atau Qc) = ("+fmt(a)+")² / ("+fmt(n)+" × "+fmt(h)+"³) = "+fmt(v)+"<br><small>Dibanding Kc = 40 → "+(Math.abs(v-40)<0.5?"setimbang":v<40?"Qc &lt; Kc: ke kanan":"Qc &gt; Kc: ke kiri")+"</small>"}
+function cmp(){const k=+kk.value,q=+qq.value;if(!(k>0)||q<0||isNaN(q)){r2.textContent="Masukkan angka valid.";return}
+const m=Math.max(k,q)*1.3;mk.style.left="calc("+(q/m*100)+"% - 3px)";mkc.style.left="calc("+(k/m*100)+"% - 3px)";
+r2.innerHTML=(Math.abs(q-k)<1e-9?"Qc = Kc → setimbang.":q<k?"Qc &lt; Kc → bergeser ke kanan.":"Qc &gt; Kc → bergeser ke kiri.")+"<br><small>Hijau = Kc, merah = Qc</small>"}
+cmp();
+document.querySelectorAll(".q[data-a]").forEach(q=>{q.querySelectorAll("input").forEach((r,i)=>r.onchange=()=>{
+const f=q.querySelector(".fb"),ok=i==+q.dataset.a;f.className="fb "+(ok?"ok":"no");f.textContent=(ok?"✔ Benar. ":"✘ Belum tepat. ")+q.dataset.e})});
+</script>
+</body></html>
